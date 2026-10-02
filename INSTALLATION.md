@@ -117,22 +117,27 @@ docker-compose down
 # MongoDB Connection
 MONGODB_URI=mongodb://localhost:27017/event_management
 
-# Security Keys (Change these in production!)
-JWT_SECRET=your_super_secret_jwt_key_12345
-SESSION_SECRET=your_super_secret_session_key_12345
+# Security Keys (REQUIRED - generate strong random values, see below)
+JWT_SECRET=<paste generated secret here>
+SESSION_SECRET=<paste a different generated secret here>
 
 # Server
 NODE_ENV=development
 PORT=3000
 ```
 
-> ⚠️ **IMPORTANT**: Change JWT_SECRET and SESSION_SECRET to random strings in production!
+Generate strong random secrets with Node.js — run this once per variable:
 
-Generate secure keys:
-```javascript
-// Run in Node.js:
-require('crypto').randomBytes(32).toString('hex')
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
 ```
+
+> ⚠️ **IMPORTANT**: Never hand-write these secrets. The server **refuses to start** if
+> JWT_SECRET or SESSION_SECRET is missing or empty. Values that still contain
+> placeholder markers such as `your_...`, `change_this` or `generate_random_string`
+> abort startup in production and print a warning in development.
+
+See `backend/.env.example` for the full list of supported environment variables.
 
 ---
 

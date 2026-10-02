@@ -151,14 +151,25 @@ Edit `backend/.env`:
 # Database
 MONGODB_URI=mongodb://localhost:27017/event_management
 
-# Security (Change these!)
-JWT_SECRET=generate_random_string_here
-SESSION_SECRET=generate_random_string_here
+# Security (REQUIRED - generate strong random secrets, see below)
+JWT_SECRET=<paste generated secret here>
+SESSION_SECRET=<paste a different generated secret here>
 
 # Server
 NODE_ENV=development
 PORT=3000
 ```
+
+Generate each secret by running this command once per variable:
+
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+The server refuses to start if JWT_SECRET or SESSION_SECRET is missing or empty.
+Placeholder values (`your_...`, `change_this`, `generate_random_string`) abort startup
+in production and warn in development. See `backend/.env.example` for all supported
+variables.
 
 ---
 

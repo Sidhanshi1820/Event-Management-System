@@ -130,25 +130,26 @@ function showMessage(text, type, form) {
 
 // Logout handler
 async function handleLogout() {
+  // The backend requires an Authorization: Bearer header on logout
+  const token = localStorage.getItem('authToken');
+
   try {
-    const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+    await fetch(`${API_BASE_URL}/auth/logout`, {
       method: 'POST',
       headers: {
+        'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
       credentials: 'include'
     });
-
-    if (response.ok) {
-      // Clear localStorage
-      localStorage.removeItem('authToken');
-      localStorage.removeItem('userData');
-
-      // Redirect to login
-      window.location.href = 'login.html';
-    }
   } catch (error) {
+    // Network/server failure must not keep the user stuck in a logged-in state
     console.error('Logout error:', error);
+  } finally {
+    // Always clear the session and send the user back to the login screen
+    localStorage.removeItem('authToken');
+    localStorage.removeItem('userData');
+    window.location.href = 'get-started.html#login';
   }
 }
 

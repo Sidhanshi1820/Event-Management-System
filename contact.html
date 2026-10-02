@@ -161,14 +161,14 @@
     <!-- Contact Form -->
     <div>
       <h2 class="text-2xl font-semibold text-navy mb-6">Request a Proposal</h2>
-      <form action="backend/submit_proposal.php" method="POST" id="contact-form" class="space-y-6">
+      <form id="contact-form" class="space-y-6">
         <div>
           <label for="full_name" class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-          <input type="text" id="full_name" name="full_name" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Your Full Name" required>
+          <input type="text" id="full_name" name="full_name" maxlength="60" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Your Full Name" required>
         </div>
         <div>
           <label for="company" class="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
-          <input type="text" id="company" name="company" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Company Name" required>
+          <input type="text" id="company" name="company" maxlength="120" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Company Name" required>
         </div>
         <div>
           <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
@@ -176,7 +176,7 @@
         </div>
         <div>
           <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-          <input type="tel" id="phone" name="phone" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Phone Number">
+          <input type="tel" id="phone" name="phone" maxlength="20" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Phone Number">
         </div>
         <div>
           <label for="event_type" class="block text-sm font-medium text-gray-700 mb-2">Event Type</label>
@@ -190,11 +190,11 @@
         </div>
         <div>
           <label for="message" class="block text-sm font-medium text-gray-700 mb-2">Event Details</label>
-          <textarea id="message" name="message" rows="5" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Provide details about your event..."></textarea>
+          <textarea id="message" name="message" rows="5" maxlength="1000" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Provide details about your event..."></textarea>
         </div>
         <button type="submit" class="btn-submit w-full bg-navy text-white py-3 px-6 rounded-lg font-semibold hover:bg-opacity-90">Submit Request</button>
       </form>
-      <div id="form-message" class="mt-4 text-center hidden"></div>
+      <div id="form-message" class="form-message mt-4 text-center hidden"></div>
     </div>
 
     <!-- Contact Info -->
@@ -211,7 +211,7 @@
         </div>
         <div>
           <h3 class="font-medium text-navy">Email</h3>
-          <p class="text-gray-600">info@eventnov@.com</p>
+          <p class="text-gray-600">info@eventova.com</p>
         </div>
         <div>
           <h3 class="font-medium text-navy">Hours</h3>
@@ -240,34 +240,78 @@
   });
 
   // Form validation and submission
+  const API_BASE_URL = 'http://localhost:3000/api';
   const form = document.getElementById('contact-form');
   const messageDiv = document.getElementById('form-message');
+  const submitBtn = form.querySelector('button[type="submit"]');
+  const defaultBtnText = submitBtn.textContent;
 
-  form.addEventListener('submit', function(e) {
-    e.preventDefault(); // Prevent default submission for demo
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
 
-    // Simple client-side validation
+    // Read only the fields that actually exist in this form
     const fullName = document.getElementById('full_name').value.trim();
     const company = document.getElementById('company').value.trim();
     const email = document.getElementById('email').value.trim();
+    const phone = document.getElementById('phone').value.trim();
     const eventType = document.getElementById('event_type').value;
+    const message = document.getElementById('message').value.trim();
 
     if (!fullName || !company || !email || !eventType) {
       showMessage('Please fill in all required fields.', 'error');
       return;
     }
 
-    // Simulate form submission
-    showMessage('Thank you! Your proposal request has been submitted. We\'ll get back to you soon.', 'success');
+    // Optional fields are omitted from the payload when empty
+    const payload = {
+      full_name: fullName,
+      email: email,
+      company: company,
+      event_type: eventType
+    };
+    if (phone) payload.phone = phone;
+    if (message) payload.message = message;
 
-    // In a real scenario, you'd submit the form here
-    // form.submit();
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Sending...';
+
+    try {
+      const response = await fetch(API_BASE_URL + '/proposals', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      // The server may answer with an HTML error page or an empty body
+      let data = {};
+      try {
+        data = await response.json();
+      } catch (parseErr) {
+        data = {};
+      }
+
+      if (data && data.success) {
+        showMessage(data.message || 'Proposal received. Our team will contact you within 24 hours.', 'success');
+        form.reset();
+      } else {
+        const serverMessage = (data && data.message)
+          ? data.message
+          : 'Unable to submit your request. Please try again later.';
+        showMessage(serverMessage, 'error');
+      }
+    } catch (err) {
+      showMessage('Network error. Please check your connection and try again.', 'error');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = defaultBtnText;
+    }
   });
 
   function showMessage(text, type) {
     messageDiv.textContent = text;
-    messageDiv.className = `mt-4 text-center ${type === 'success' ? 'text-green-600' : 'text-red-600'}`;
-    messageDiv.classList.remove('hidden');
+    // Use classList so the `form-message` hook class is never wiped
+    messageDiv.classList.remove('hidden', 'text-green-600', 'text-red-600');
+    messageDiv.classList.add(type === 'success' ? 'text-green-600' : 'text-red-600');
     setTimeout(() => {
       messageDiv.classList.add('hidden');
     }, 5000);

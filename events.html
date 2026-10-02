@@ -481,12 +481,26 @@
 
   // Personalized welcome after login / register
   if (localStorage.getItem('authToken')) {
-    const user = JSON.parse(localStorage.getItem('userData') || 'null');
+    let user = null;
+    try {
+      user = JSON.parse(localStorage.getItem('userData') || 'null');
+    } catch (err) {
+      user = null;
+    }
     const banner = document.getElementById('welcome-banner');
     const text = document.getElementById('welcome-text');
     if (user && (user.full_name || user.fullName)) {
       const name = user.full_name || user.fullName;
-      text.innerHTML = `👋 Welcome back, <span class="font-semibold text-navy">${name}</span>! You're signed in — browse the event types below and book your next corporate event.`;
+      text.textContent = '👋 Welcome back, ';
+      const nameSpan = document.createElement('span');
+      nameSpan.className = 'font-semibold text-navy';
+      nameSpan.textContent = name;
+      text.appendChild(nameSpan);
+      text.appendChild(
+        document.createTextNode(
+          "! You're signed in — browse the event types below and book your next corporate event."
+        )
+      );
     } else {
       text.textContent = "👋 You're signed in! Browse the event types below and book your next corporate event.";
     }

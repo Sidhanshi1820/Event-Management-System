@@ -291,9 +291,15 @@
   // Show a notice if the visitor is already signed in
   if (localStorage.getItem('authToken')) {
     const notice = document.getElementById('signed-in-notice');
-    const user = JSON.parse(localStorage.getItem('userData') || 'null');
-    if (user && user.full_name) {
-      notice.textContent = `You're already signed in as ${user.full_name}. `;
+    let user = null;
+    try {
+      user = JSON.parse(localStorage.getItem('userData') || 'null');
+    } catch (err) {
+      user = null;
+    }
+    const userName = user && (user.full_name || user.fullName);
+    if (userName) {
+      notice.textContent = `You're already signed in as ${userName}. `;
       const link = document.createElement('a');
       link.href = 'dashboard.html';
       link.className = 'font-semibold underline';

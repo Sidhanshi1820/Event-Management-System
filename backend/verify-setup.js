@@ -81,6 +81,39 @@ if (fs.existsSync(envPath)) {
   } else {
     console.log('  ⚠ JWT_SECRET not found in .env');
   }
+
+  if (envContent.includes('SESSION_SECRET')) {
+    console.log('  ✓ SESSION_SECRET configured');
+    passed++;
+  } else {
+    console.log('  ⚠ SESSION_SECRET not found in .env - add a strong random value');
+  }
+
+  // Check .env secrets are not still the placeholder defaults
+  const readEnvValue = (key) => {
+    const match = envContent.match(new RegExp(`^${key}\\s*=\\s*(.*)$`, 'm'));
+    return match ? match[1].trim().replace(/^["']|["']$/g, '') : null;
+  };
+
+  const isPlaceholder = (value) =>
+    !value ||
+    value.toLowerCase().includes('change_this') ||
+    value.toLowerCase().startsWith('your_');
+
+  ['JWT_SECRET', 'SESSION_SECRET'].forEach(key => {
+    const value = readEnvValue(key);
+    if (isPlaceholder(value)) {
+      console.log(
+        `  ✗ ${key} is still a placeholder` +
+        `${value ? ` ("${value}")` : ' (missing or empty)'}` +
+        ' - replace it with a long random string'
+      );
+      failed++;
+    } else {
+      console.log(`  ✓ ${key} is a custom value`);
+      passed++;
+    }
+  });
 } else {
   console.log('✗ .env file not found - create from .env.example');
   failed++;

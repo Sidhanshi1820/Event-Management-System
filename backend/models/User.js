@@ -6,29 +6,49 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Full name is required'],
     trim: true,
-    minlength: [2, 'Full name must be at least 2 characters']
+    minlength: [2, 'Full name must be at least 2 characters'],
+    maxlength: [60, 'Full name cannot exceed 60 characters'],
+    validate: {
+      validator: function(value) {
+        return !/[<>]/.test(value);
+      },
+      message: 'Full name cannot contain < or > characters'
+    }
   },
   email: {
     type: String,
     required: [true, 'Email is required'],
     unique: true,
     lowercase: true,
-    match: [/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/, 'Please provide a valid email']
+    match: [/^[^\s@]+@[^\s@]+\.[A-Za-z]{2,}$/, 'Please provide a valid email']
   },
   company: {
     type: String,
     required: [true, 'Company name is required'],
-    trim: true
+    trim: true,
+    minlength: [2, 'Company name must be at least 2 characters'],
+    maxlength: [120, 'Company name cannot exceed 120 characters'],
+    validate: {
+      validator: function(value) {
+        return !/[<>]/.test(value);
+      },
+      message: 'Company name cannot contain < or > characters'
+    }
   },
   password: {
     type: String,
     required: [true, 'Password is required'],
     minlength: [8, 'Password must be at least 8 characters'],
+    maxlength: [72, 'Password cannot exceed 72 characters'],
     select: false // Don't return password by default
   },
   isVerified: {
     type: Boolean,
     default: false
+  },
+  tokenVersion: {
+    type: Number,
+    default: 0
   },
   verificationToken: {
     type: String,

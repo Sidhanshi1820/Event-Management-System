@@ -6,8 +6,8 @@ const { verifyToken } = require('../middleware/auth');
 // Get current user profile
 router.get('/profile', verifyToken, async (req, res) => {
   try {
-    const user = await User.findById(req.session.userId);
-    
+    const user = await User.findById(req.userId);
+
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -28,9 +28,10 @@ router.get('/profile', verifyToken, async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('Error fetching profile:', error);
     res.status(500).json({
       success: false,
-      message: error.message || 'Failed to fetch profile'
+      message: 'Failed to fetch profile'
     });
   }
 });
@@ -48,7 +49,7 @@ router.put('/profile', verifyToken, async (req, res) => {
     }
 
     const user = await User.findByIdAndUpdate(
-      req.session.userId,
+      req.userId,
       {
         fullName,
         company,
@@ -75,9 +76,20 @@ router.put('/profile', verifyToken, async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('Error updating profile:', error);
+
+    // Schema validation (e.g. `<`/`>` rejected in fullName/company)
+    if (error && error.name === 'ValidationError' && error.errors) {
+      const firstField = Object.keys(error.errors)[0];
+      return res.status(400).json({
+        success: false,
+        message: firstField ? error.errors[firstField].message : 'Please check the details you entered.'
+      });
+    }
+
     res.status(500).json({
       success: false,
-      message: error.message || 'Failed to update profile'
+      message: 'Failed to update profile'
     });
   }
 });
@@ -101,6 +113,15 @@ router.post('/change-password', verifyToken, async (req, res) => {
       });
     }
 
+    // bcrypt truncates past 72 BYTES, not 72 characters — a multi-byte
+    // password can be under 72 chars and still exceed the limit.
+    if (newPassword.length > 72 || Buffer.byteLength(newPassword, 'utf8') > 72) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password cannot exceed 72 characters'
+      });
+    }
+
     if (newPassword.length < 8) {
       return res.status(400).json({
         success: false,
@@ -108,7 +129,7 @@ router.post('/change-password', verifyToken, async (req, res) => {
       });
     }
 
-    const user = await User.findById(req.session.userId).select('+password');
+    const user = await User.findById(req.userId).select('+password');
 
     if (!user) {
       return res.status(404).json({
@@ -125,7 +146,9 @@ router.post('/change-password', verifyToken, async (req, res) => {
       });
     }
 
+    // Bump tokenVersion so every previously issued JWT (all devices) is revoked
     user.password = newPassword;
+    user.tokenVersion = (user.tokenVersion || 0) + 1;
     await user.save();
 
     res.status(200).json({
@@ -133,9 +156,10 @@ router.post('/change-password', verifyToken, async (req, res) => {
       message: 'Password changed successfully'
     });
   } catch (error) {
+    console.error('Error changing password:', error);
     res.status(500).json({
       success: false,
-      message: error.message || 'Failed to change password'
+      message: 'Error changing password'
     });
   }
 });
@@ -143,7 +167,7 @@ router.post('/change-password', verifyToken, async (req, res) => {
 // Delete user account
 router.delete('/account', verifyToken, async (req, res) => {
   try {
-    const user = await User.findByIdAndDelete(req.session.userId);
+    const user = await User.findByIdAndDelete(req.userId);
 
     if (!user) {
       return res.status(404).json({
@@ -152,7 +176,9 @@ router.delete('/account', verifyToken, async (req, res) => {
       });
     }
 
-    req.session.destroy();
+    if (req.session) {
+      req.session.destroy();
+    }
     res.clearCookie('connect.sid');
 
     res.status(200).json({
@@ -160,9 +186,10 @@ router.delete('/account', verifyToken, async (req, res) => {
       message: 'Account deleted successfully'
     });
   } catch (error) {
+    console.error('Error deleting account:', error);
     res.status(500).json({
       success: false,
-      message: error.message || 'Failed to delete account'
+      message: 'Failed to delete account'
     });
   }
 });

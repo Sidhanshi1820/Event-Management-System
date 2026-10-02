@@ -5,8 +5,10 @@ const User = require('../models/User');
 const { verifyToken } = require('../middleware/auth');
 
 // Generate JWT Token
-const generateToken = (userId) => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET || 'your_jwt_secret', {
+// `tv` is the user's current tokenVersion — bumping it on the user document
+// invalidates every token issued before that change.
+const generateToken = (userId, userTokenVersion) => {
+  return jwt.sign({ userId, tv: userTokenVersion }, process.env.JWT_SECRET, {
     expiresIn: '24h'
   });
 };
@@ -32,6 +34,16 @@ router.post('/register', async (req, res) => {
       });
     }
 
+    // bcrypt silently truncates anything past 72 BYTES, not 72 characters.
+    // A 56-char emoji password is 96 UTF-8 bytes and would be truncated, so a
+    // different 44-char password could match the same hash. Check bytes too.
+    if (password.length > 72 || Buffer.byteLength(password, 'utf8') > 72) {
+      return res.status(400).json({
+        success: false,
+        message: 'Password cannot exceed 72 characters'
+      });
+    }
+
     // Check if email already exists
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
@@ -53,7 +65,7 @@ router.post('/register', async (req, res) => {
     await user.save();
 
     // Generate token
-    const token = generateToken(user._id);
+    const token = generateToken(user._id, user.tokenVersion);
 
     // Store in session
     req.session.userId = user._id;
@@ -73,9 +85,27 @@ router.post('/register', async (req, res) => {
     });
   } catch (error) {
     console.error('Registration error:', error);
+
+    // Duplicate key (email already in the collection)
+    if (error && error.code === 11000) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email already registered'
+      });
+    }
+
+    // Schema validation (password length, name/company characters, email format)
+    if (error && error.name === 'ValidationError' && error.errors) {
+      const firstField = Object.keys(error.errors)[0];
+      return res.status(400).json({
+        success: false,
+        message: firstField ? error.errors[firstField].message : 'Please check the details you entered.'
+      });
+    }
+
     res.status(500).json({
       success: false,
-      message: error.message || 'Registration failed'
+      message: 'Registration failed. Please try again.'
     });
   }
 });
@@ -113,14 +143,14 @@ router.post('/login', async (req, res) => {
     }
 
     // Add login history
-    const ipAddress = req.ip || req.connection.remoteAddress;
+    const ipAddress = req.ip || req.socket.remoteAddress;
     const userAgent = req.get('User-Agent') || 'Unknown';
     user.addLoginHistory(ipAddress, userAgent);
     user.lastLogin = new Date();
     await user.save();
 
     // Generate token
-    const token = generateToken(user._id);
+    const token = generateToken(user._id, user.tokenVersion);
 
     // Set session
     const sessionExpiry = remember ? 30 * 24 * 60 * 60 * 1000 : 24 * 60 * 60 * 1000; // 30 days or 24 hours
@@ -128,10 +158,6 @@ router.post('/login', async (req, res) => {
     req.session.userId = user._id;
     req.session.userEmail = user.email;
     req.session.userName = user.fullName;
-
-    // Send back user data without password
-    const userData = user.toObject();
-    delete userData.password;
 
     res.status(200).json({
       success: true,
@@ -149,32 +175,44 @@ router.post('/login', async (req, res) => {
     console.error('Login error:', error);
     res.status(500).json({
       success: false,
-      message: error.message || 'Login failed'
+      message: 'Login failed. Please try again.'
     });
   }
 });
 
 // Logout Route
-router.post('/logout', (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      return res.status(500).json({
-        success: false,
-        message: 'Logout failed'
-      });
+// Bumping tokenVersion revokes every JWT already issued for this user.
+router.post('/logout', verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.userId);
+
+    if (user) {
+      user.tokenVersion = (user.tokenVersion || 0) + 1;
+      await user.save();
     }
-    res.clearCookie('connect.sid');
-    res.status(200).json({
-      success: true,
-      message: 'Logout successful'
+
+    // Destroying the session is best-effort; the token is already revoked,
+    // so a missing/failed session must not fail the logout.
+    req.session.destroy(() => {
+      res.clearCookie('connect.sid');
+      res.status(200).json({
+        success: true,
+        message: 'Logout successful'
+      });
     });
-  });
+  } catch (error) {
+    console.error('Logout error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Logout failed. Please try again.'
+    });
+  }
 });
 
 // Check authentication status
 router.get('/status', verifyToken, async (req, res) => {
   try {
-    const user = await User.findById(req.session.userId);
+    const user = await User.findById(req.userId);
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -193,6 +231,7 @@ router.get('/status', verifyToken, async (req, res) => {
       }
     });
   } catch (error) {
+    console.error('Auth status error:', error);
     res.status(401).json({
       success: false,
       authenticated: false,
@@ -204,7 +243,7 @@ router.get('/status', verifyToken, async (req, res) => {
 // Get login history
 router.get('/login-history', verifyToken, async (req, res) => {
   try {
-    const user = await User.findById(req.session.userId);
+    const user = await User.findById(req.userId);
     if (!user) {
       return res.status(404).json({
         success: false,
@@ -217,9 +256,10 @@ router.get('/login-history', verifyToken, async (req, res) => {
       loginHistory: user.loginHistory || []
     });
   } catch (error) {
+    console.error('Login history error:', error);
     res.status(500).json({
       success: false,
-      message: error.message || 'Failed to fetch login history'
+      message: 'Failed to fetch login history'
     });
   }
 });
