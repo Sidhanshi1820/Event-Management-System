@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Event Types - EventNov@</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Browse every type of corporate event you can plan with EventNov@." />
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Your external CSS -->
+  <link rel="stylesheet" href="style.css" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: "#0B1C2D",
+            greybg: "#F3F5F7",
+            charcoal: "#2B2E34",
+            accent: "#2EC4B6"
+          },
+          fontFamily: {
+            sans: ["Inter", "system-ui", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Event cards */
+    .event-card {
+      background: white;
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .event-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .event-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 3.5rem;
+      height: 3.5rem;
+      font-size: 1.75rem;
+      border-radius: 9999px;
+      background-color: rgba(46, 196, 182, 0.12);
+    }
+
+    .category-chip {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #0f766e;
+      background-color: rgba(46, 196, 182, 0.15);
+    }
+
+    .card-cta {
+      display: block;
+      text-align: center;
+      font-size: 0.875rem;
+      font-weight: 600;
+      background-color: #0B1C2D;
+      color: white;
+      padding: 0.65rem 1rem;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .card-cta:hover {
+      background-color: rgba(11, 28, 45, 0.9);
+      transform: translateY(-1px);
+    }
+
+    /* Search input */
+    .search-input {
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .search-input:focus {
+      border-color: #2EC4B6;
+      box-shadow: 0 0 0 3px rgba(46, 196, 182, 0.1);
+      outline: none;
+    }
+
+    /* Hamburger menu */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+    }
+
+    .hamburger span {
+      width: 25px;
+      height: 3px;
+      background-color: #0B1C2D;
+      margin: 3px 0;
+      transition: 0.3s;
+    }
+
+    .hamburger.active span:nth-child(1) {
+      transform: rotate(-45deg) translate(-5px, 6px);
+    }
+
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.active span:nth-child(3) {
+      transform: rotate(45deg) translate(-5px, -6px);
+    }
+
+    .nav-menu {
+      display: flex;
+    }
+
+    .nav-menu.mobile {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background-color: white;
+      flex-direction: column;
+      padding: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-menu.mobile.active {
+      display: flex;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hamburger {
+        display: flex;
+      }
+      .nav-menu {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body class="font-sans text-charcoal bg-greybg">
+
+<header class="fixed w-full bg-white/90 backdrop-blur border-b z-50">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    <a href="home.html" class="text-xl font-semibold text-navy">EventNov@</a>
+    <nav class="space-x-6 hidden md:flex text-sm">
+      <a href="home.html" class="hover:text-accent transition">Home</a>
+      <a href="services.html" class="hover:text-accent transition">Services</a>
+      <a href="events.html" class="text-accent font-semibold transition">Event Types</a>
+      <a href="about.html" class="hover:text-accent transition">About</a>
+      <a href="contact.html" class="hover:text-accent transition">Contact</a>
+      <a href="dashboard.html" class="hover:text-accent transition">Dashboard</a>
+    </nav>
+    <!-- Mobile hamburger menu -->
+    <div class="hamburger md:hidden" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <nav class="nav-menu mobile" id="nav-menu">
+      <a href="home.html" class="py-2 hover:text-accent transition">Home</a>
+      <a href="services.html" class="py-2 hover:text-accent transition">Services</a>
+      <a href="events.html" class="py-2 text-accent font-semibold transition">Event Types</a>
+      <a href="about.html" class="py-2 hover:text-accent transition">About</a>
+      <a href="contact.html" class="py-2 hover:text-accent transition">Contact</a>
+      <a href="dashboard.html" class="py-2 hover:text-accent transition">Dashboard</a>
+    </nav>
+  </div>
+</header>
+
+<section class="pt-40 pb-8 bg-greybg text-center">
+  <h1 class="text-4xl md:text-5xl font-bold text-navy mb-4 px-4">Explore All Event Types</h1>
+  <p class="max-w-2xl mx-auto text-lg text-gray-600 px-4">
+    From large-scale conferences to intimate executive retreats — every type of corporate event, planned end to end.
+  </p>
+  <div class="flex flex-wrap justify-center items-center gap-x-6 gap-y-2 mt-6 px-4 text-sm text-gray-600">
+    <span><span class="font-semibold text-navy">12</span> corporate event types</span>
+    <span><span class="font-semibold text-navy">500+</span> events organized</span>
+    <span><span class="font-semibold text-navy">4.9 ★</span> average rating</span>
+    <span>Pan-India &amp; virtual</span>
+  </div>
+</section>
+
+<!-- Personalized welcome (visible after login / register) -->
+<section class="pb-8 bg-greybg">
+  <div class="max-w-4xl mx-auto px-6">
+    <div id="welcome-banner" class="hidden bg-white border-l-4 border-accent rounded-lg shadow-sm p-5 text-center">
+      <p id="welcome-text" class="text-gray-700"></p>
+    </div>
+  </div>
+</section>
+
+<!-- Search -->
+<section class="pb-12 bg-greybg">
+  <div class="max-w-4xl mx-auto px-6">
+    <div class="relative">
+      <input type="text" id="event-search" class="search-input w-full px-5 py-3.5 border border-gray-300 rounded-full bg-white"
+             placeholder="Search event types (e.g. launch, gala, webinar...)" aria-label="Search event types">
+    </div>
+    <p id="no-results" class="hidden text-center text-gray-500 mt-8">No event types match your search.</p>
+  </div>
+</section>
+
+<!-- Event types grid -->
+<section class="pb-20 bg-greybg">
+  <div class="max-w-6xl mx-auto px-6">
+    <div id="event-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+      <div class="event-card p-6 flex flex-col" data-name="conferences corporate summit keynote">
+        <div class="event-icon mb-4">🎤</div>
+        <h3 class="text-xl font-semibold text-navy mb-2">Conferences</h3>
+        <p class="text-gray-600 mb-4 flex-grow">Multi-day corporate conferences with keynotes, breakout sessions, panels, and sponsor zones.</p>
+        <div class="flex items-center gap-2 mb-3 text-sm">
+          <span class="text-amber-500">★★★★★</span>
+          <span class="text-gray-500">4.9 (214 reviews)</span>
+        </div>
+        <div class="flex items-center justify-between border-t pt-3">
+          <span class="category-chip">conference</span>
+          <div class="text-right">
+            <p class="text-xs text-gray-500">Starting from</p>
+            <p class="text-sm font-semibold text-navy">₹2,00,000</p>
+          </div>
+        </div>
+        <a href="contact.html" class="card-cta mt-4">Book this event →</a>
+      </div>
+
+      <div class="event-card p-6 flex flex-col" data-name="seminars education knowledge expert">
+        <div class="event-icon mb-4">📚</div>
+        <h3 class="text-xl font-semibold text-navy mb-2">Seminars</h3>
+        <p class="text-gray-600 mb-4 flex-grow">Expert-led educational sessions designed to share knowledge across your teams and industry.</p>
+        <div class="flex items-center gap-2 mb-3 text-sm">
+          <span class="text-amber-500">★★★★★</span>
+          <span class="text-gray-500">4.8 (126 reviews)</span>
+        </div>
+        <div class="flex items-center justify-between border-t pt-3">
+          <span class="category-chip">seminar</span>
+          <div class="text-right">
+            <p class="text-xs text-gray-500">Starting from</p>
+            <p class="text-sm font-semibold text-navy">₹75,000</p>
+          </div>
+        </div>
+        <a href="contact.html" class="card-cta mt-4">Book this event →</a>
+      </div>
+
+      <div class="event-card p-6 flex flex-col" data-name="workshops training skills hands-on development">
+        <div class="event-icon mb-4">🛠️</div>
+        <h3 class="text-xl font-semibold text-navy mb-2">Workshops &amp; Training</h3>
+        <p class="text-gray-600 mb-4 flex-grow">Hands-on skill-building workshops and corporate training programs for every department.</p>
+        <div class="flex items-center gap-2 mb-3 text-sm">
+          <span class="text-amber-500">★★★★★</span>
+          <span class="text-gray-500">4.8 (98 reviews)</span>
+        </div>
+        <div class="flex items-center justify-between border-t pt-3">
+          <span class="category-chip">workshop · training</span>
+          <div class="text-right">
+            <p class="text-xs text-gray-500">Starting from</p>
+            <p class="text-sm font-semibold text-navy">₹60,000</p>
+          </div>
+        </div>
+        <a href="contact.html" class="card-cta mt-4">Book this event →</a>
+      </div>
+
+      <div class="event-card p-6 flex flex-col" data-name="webinars online virtual live streaming sessions">
+        <div class="event-icon mb-4">💻</div>
+        <h3 class="text-xl font-semibold text-navy mb-2">Webinars</h3>
+        <p class="text-gray-600 mb-4 flex-grow">Live online sessions and virtual classrooms with Q&amp;A, polls, and on-demand replays.</p>
+        <div class="flex items-center gap-2 mb-3 text-sm">
+          <span class="text-amber-500">★★★★★</span>
+          <span class="text-gray-500">4.9 (87 reviews)</span>
+        </div>
+        <div class="flex items-center justify-between border-t pt-3">
+          <span class="category-chip">webinar</span>
+          <div class="text-right">
+            <p class="text-xs text-gray-500">Starting from</p>
+            <p class="text-sm font-semibold text-navy">₹35,000</p>
+          </div>
+        </div>
+        <a href="contact.html" class="card-cta mt-4">Book this event →</a>
+      </div>
+
+      <div class="event-card p-6 flex flex-col" data-name="product launches unveiling press market reveal">
+        <div class="event-icon mb-4">🚀</div>
+        <h3 class="text-xl font-semibold text-navy mb-2">Product Launches</h3>
+        <p class="text-gray-600 mb-4 flex-grow">High-impact launch events to unveil new products to the press, partners, and customers.</p>
+        <div class="flex items-center gap-2 mb-3 text-sm">
+          <span class="text-amber-500">★★★★★</span>
+          <span class="text-gray-500">5.0 (72 reviews)</span>
+        </div>
+        <div class="flex items-center justify-between border-t pt-3">
+          <span class="category-chip">launch</span>
+          <div class="text-right">
+            <p class="text-xs text-gray-500">Starting from</p>
+            <p class="text-sm font-semibold text-navy">₹3,50,000</p>
+          </div>
+        </div>
+        <a href="contact.html" class="card-cta mt-4">Book this event →</a>
+      </div>
+
+      <div class="event-card p-6 flex flex-col" data-name="trade shows exhibitions booths expo demos">
+        <div class="event-icon mb-4">🎪</div>
+        <h3 class="text-xl font-semibold text-navy mb-2">Trade Shows &amp; Exhibitions</h3>
+        <p class="text-gray-600 mb-4 flex-grow">Exhibition booths, live demos, and expo floor management that put your brand in the spotlight.</p>
+        <div class="flex items-center gap-2 mb-3 text-sm">
+          <span class="text-amber-500">★★★★★</span>
+          <span class="text-gray-500">4.7 (54 reviews)</span>
+        </div>
+        <div class="flex items-center justify-between border-t pt-3">
+          <span class="category-chip">exhibition</span>
+          <div class="text-right">
+            <p class="text-xs text-gray-500">Starting from</p>
+            <p class="text-sm font-semibold text-navy">₹2,50,000</p>
+          </div>
+        </div>
+        <a href="contact.html" class="card-cta mt-4">Book this event →</a>
+      </div>
+
+      <div class="event-card p-6 flex flex-col" data-name="networking mixers business connections professional">
+        <div class="event-icon mb-4">🤝</div>
+        <h3 class="text-xl font-semibold text-navy mb-2">Networking Events</h3>
+        <p class="text-gray-600 mb-4 flex-grow">Business mixers and networking sessions that turn contacts into lasting partnerships.</p>
+        <div class="flex items-center gap-2 mb-3 text-sm">
+          <span class="text-amber-500">★★★★★</span>
+          <span class="text-gray-500">4.8 (66 reviews)</span>
+        </div>
+        <div class="flex items-center justify-between border-t pt-3">
+          <span class="category-chip">networking</span>
+          <div class="text-right">
+            <p class="text-xs text-gray-500">Starting from</p>
+            <p class="text-sm font-semibold text-navy">₹50,000</p>
+          </div>
+        </div>
+        <a href="contact.html" class="card-cta mt-4">Book this event →</a>
+      </div>
+
+      <div class="event-card p-6 flex flex-col" data-name="meetups team gatherings informal social">
+        <div class="event-icon mb-4">☕</div>
+        <h3 class="text-xl font-semibold text-navy mb-2">Team Meetups</h3>
+        <p class="text-gray-600 mb-4 flex-grow">Casual team gatherings and community meetups to keep people connected and engaged.</p>
+        <div class="flex items-center gap-2 mb-3 text-sm">
+          <span class="text-amber-500">★★★★★</span>
+          <span class="text-gray-500">4.9 (45 reviews)</span>
+        </div>
+        <div class="flex items-center justify-between border-t pt-3">
+          <span class="category-chip">meetup</span>
+          <div class="text-right">
+            <p class="text-xs text-gray-500">Starting from</p>
+            <p class="text-sm font-semibold text-navy">₹40,000</p>
+          </div>
+        </div>
+        <a href="contact.html" class="card-cta mt-4">Book this event →</a>
+      </div>
+
+      <div class="event-card p-6 flex flex-col" data-name="galas award nights ceremonies dinners celebrations">
+        <div class="event-icon mb-4">🏆</div>
+        <h3 class="text-xl font-semibold text-navy mb-2">Galas &amp; Award Nights</h3>
+        <p class="text-gray-600 mb-4 flex-grow">Formal dinners, award ceremonies, and milestone celebrations your teams will remember.</p>
+        <div class="flex items-center gap-2 mb-3 text-sm">
+          <span class="text-amber-500">★★★★★</span>
+          <span class="text-gray-500">5.0 (58 reviews)</span>
+        </div>
+        <div class="flex items-center justify-between border-t pt-3">
+          <span class="category-chip">gala</span>
+          <div class="text-right">
+            <p class="text-xs text-gray-500">Starting from</p>
+            <p class="text-sm font-semibold text-navy">₹3,00,000</p>
+          </div>
+        </div>
+        <a href="contact.html" class="card-cta mt-4">Book this event →</a>
+      </div>
+
+      <div class="event-card p-6 flex flex-col" data-name="board meetings executive retreats strategy leadership offsite">
+        <div class="event-icon mb-4">📊</div>
+        <h3 class="text-xl font-semibold text-navy mb-2">Board Meetings &amp; Retreats</h3>
+        <p class="text-gray-600 mb-4 flex-grow">Confidential board meetings and executive strategy retreats at premium venues.</p>
+        <div class="flex items-center gap-2 mb-3 text-sm">
+          <span class="text-amber-500">★★★★★</span>
+          <span class="text-gray-500">4.9 (39 reviews)</span>
+        </div>
+        <div class="flex items-center justify-between border-t pt-3">
+          <span class="category-chip">retreat</span>
+          <div class="text-right">
+            <p class="text-xs text-gray-500">Starting from</p>
+            <p class="text-sm font-semibold text-navy">₹1,25,000</p>
+          </div>
+        </div>
+        <a href="contact.html" class="card-cta mt-4">Book this event →</a>
+      </div>
+
+      <div class="event-card p-6 flex flex-col" data-name="charity csr fundraising volunteer community giving">
+        <div class="event-icon mb-4">❤️</div>
+        <h3 class="text-xl font-semibold text-navy mb-2">Charity &amp; CSR Events</h3>
+        <p class="text-gray-600 mb-4 flex-grow">Fundraisers, volunteer days, and community programs that showcase your company's values.</p>
+        <div class="flex items-center gap-2 mb-3 text-sm">
+          <span class="text-amber-500">★★★★★</span>
+          <span class="text-gray-500">4.8 (31 reviews)</span>
+        </div>
+        <div class="flex items-center justify-between border-t pt-3">
+          <span class="category-chip">charity</span>
+          <div class="text-right">
+            <p class="text-xs text-gray-500">Starting from</p>
+            <p class="text-sm font-semibold text-navy">₹1,00,000</p>
+          </div>
+        </div>
+        <a href="contact.html" class="card-cta mt-4">Book this event →</a>
+      </div>
+
+      <div class="event-card p-6 flex flex-col" data-name="sports team building activities olympics games">
+        <div class="event-icon mb-4">🏅</div>
+        <h3 class="text-xl font-semibold text-navy mb-2">Sports &amp; Team Building</h3>
+        <p class="text-gray-600 mb-4 flex-grow">Corporate sports days and team-building activities that strengthen collaboration.</p>
+        <div class="flex items-center gap-2 mb-3 text-sm">
+          <span class="text-amber-500">★★★★★</span>
+          <span class="text-gray-500">4.9 (49 reviews)</span>
+        </div>
+        <div class="flex items-center justify-between border-t pt-3">
+          <span class="category-chip">sports</span>
+          <div class="text-right">
+            <p class="text-xs text-gray-500">Starting from</p>
+            <p class="text-sm font-semibold text-navy">₹80,000</p>
+          </div>
+        </div>
+        <a href="contact.html" class="card-cta mt-4">Book this event →</a>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer class="py-10 text-center text-sm text-gray-500 border-t bg-white">
+  © 2026 EventNov@. All rights reserved. <a href="#" class="hover:text-accent">Privacy Policy</a> | <a href="#" class="hover:text-accent">Terms of Service</a>
+</footer>
+
+<script>
+  // Hamburger menu toggle
+  const hamburger = document.getElementById('hamburger');
+  const navMenu = document.getElementById('nav-menu');
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('active');
+    navMenu.classList.toggle('active');
+  });
+
+  // Live search filter for event cards
+  const searchInput = document.getElementById('event-search');
+  const cards = document.querySelectorAll('#event-grid .event-card');
+  const noResults = document.getElementById('no-results');
+
+  searchInput.addEventListener('input', () => {
+    const query = searchInput.value.trim().toLowerCase();
+    let visibleCount = 0;
+
+    cards.forEach(card => {
+      const haystack = (card.dataset.name + ' ' + card.textContent).toLowerCase();
+      const matches = !query || haystack.includes(query);
+      card.classList.toggle('hidden', !matches);
+      if (matches) visibleCount++;
+    });
+
+    noResults.classList.toggle('hidden', visibleCount > 0);
+  });
+
+  // Personalized welcome after login / register
+  if (localStorage.getItem('authToken')) {
+    const user = JSON.parse(localStorage.getItem('userData') || 'null');
+    const banner = document.getElementById('welcome-banner');
+    const text = document.getElementById('welcome-text');
+    if (user && (user.full_name || user.fullName)) {
+      const name = user.full_name || user.fullName;
+      text.innerHTML = `👋 Welcome back, <span class="font-semibold text-navy">${name}</span>! You're signed in — browse the event types below and book your next corporate event.`;
+    } else {
+      text.textContent = "👋 You're signed in! Browse the event types below and book your next corporate event.";
+    }
+    banner.classList.remove('hidden');
+  }
+</script>
+
+<!-- Authentication Script -->
+<script src="./auth.js"></script>
+
+</body>
+</html>

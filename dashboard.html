@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard - EventNov@</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="User Dashboard - EventNov@" />
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: "#0B1C2D",
+            greybg: "#F3F5F7",
+            charcoal: "#2B2E34",
+            accent: "#2EC4B6"
+          },
+          fontFamily: {
+            sans: ["Inter", "system-ui", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    .form-input {
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .form-input:focus {
+      border-color: #2EC4B6;
+      box-shadow: 0 0 0 3px rgba(46, 196, 182, 0.15);
+      outline: none;
+    }
+  </style>
+</head>
+
+<body class="font-sans text-gray-900 bg-gray-50">
+
+<!-- Header -->
+<header class="fixed w-full bg-white border-b z-50">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    <a href="home.html" class="text-xl font-semibold text-navy">EventNov@</a>
+    <nav class="space-x-6 hidden md:flex text-sm">
+      <a href="home.html" class="hover:text-accent transition">Home</a>
+      <a href="events.html" class="hover:text-accent transition">Event Types</a>
+      <a href="services.html" class="hover:text-accent transition">Services</a>
+      <a href="dashboard.html" class="hover:text-accent transition">Dashboard</a>
+      <button onclick="handleLogout()" class="text-red-600 hover:text-red-700 font-semibold">Logout</button>
+    </nav>
+  </div>
+</header>
+
+<main class="pt-24 pb-12">
+  <div class="max-w-6xl mx-auto px-6">
+    <!-- Welcome / Identity Banner -->
+    <div class="bg-gradient-to-r from-navy via-teal-800 to-teal-600 rounded-2xl shadow-lg p-8 mb-8 text-white">
+      <div class="flex flex-col md:flex-row md:items-center gap-6">
+        <div id="avatar-circle" class="w-20 h-20 shrink-0 rounded-full bg-white/20 border-2 border-white/40 flex items-center justify-center text-3xl font-bold tracking-wide">
+          ?
+        </div>
+        <div class="flex-1 min-w-0">
+          <h1 class="text-3xl font-bold mb-1">Welcome back, <span id="welcome-name">…</span> 👋</h1>
+          <p class="text-white/75 mb-4">Manage your profile and events from your personal dashboard.</p>
+          <div class="flex flex-wrap items-center gap-2 text-sm">
+            <span class="inline-flex items-center gap-2 bg-white/10 border border-white/25 rounded-full px-4 py-1.5">
+              <span title="Your unique user ID">🆔 ID:</span>
+              <code id="user-id" class="font-mono text-white/95 break-all">—</code>
+              <button type="button" onclick="copyUserId()" id="copy-id-btn" class="text-xs bg-white/20 hover:bg-white/30 rounded-full px-2.5 py-0.5 transition">Copy</button>
+            </span>
+            <span id="welcome-email" class="inline-flex items-center gap-1.5 bg-white/10 border border-white/25 rounded-full px-4 py-1.5">✉️ —</span>
+            <span id="welcome-company" class="inline-flex items-center gap-1.5 bg-white/10 border border-white/25 rounded-full px-4 py-1.5">🏢 —</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+      <!-- User Profile Card -->
+      <div class="md:col-span-2 bg-white rounded-lg shadow-md p-8">
+        <h2 class="text-2xl font-semibold mb-6 text-gray-900">Your Profile</h2>
+        
+        <div id="profile-content" class="space-y-4">
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-600">Loading profile...</p>
+          </div>
+        </div>
+
+        <!-- Edit Profile Form -->
+        <div id="edit-profile-form" class="mt-8 border-t pt-8 hidden">
+          <h3 class="text-lg font-semibold mb-4">Edit Profile</h3>
+          <form id="profile-update-form" class="space-y-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+                <input type="text" id="edit-fullname" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Company</label>
+                <input type="text" id="edit-company" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+              </div>
+            </div>
+            <div class="flex gap-4">
+              <button type="submit" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Save Changes</button>
+              <button type="button" onclick="toggleEditProfile()" class="px-6 py-2 bg-gray-300 text-gray-900 rounded-lg hover:bg-gray-400">Cancel</button>
+            </div>
+          </form>
+          <div id="profile-message" class="mt-4 hidden"></div>
+        </div>
+
+        <button onclick="toggleEditProfile()" id="edit-profile-btn" class="mt-6 px-6 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700">Edit Profile</button>
+      </div>
+
+      <!-- Quick Stats -->
+      <div class="bg-white rounded-lg shadow-md p-8">
+        <h3 class="text-lg font-semibold mb-6">Quick Stats</h3>
+        <div class="space-y-4">
+          <div class="bg-blue-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-600">✅ Account Status</p>
+            <p class="text-xl font-semibold text-blue-600">Active</p>
+          </div>
+          <div class="bg-green-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-600">📅 Member Since</p>
+            <p id="member-since" class="text-lg font-semibold text-green-600">-</p>
+          </div>
+          <div class="bg-purple-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-600">🕐 Last Login</p>
+            <p id="last-login" class="text-lg font-semibold text-purple-600">-</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Change Password Section -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+      <div class="bg-white rounded-lg shadow-md p-8">
+        <h3 class="text-lg font-semibold mb-6">Change Password</h3>
+        <form id="change-password-form" class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Current Password</label>
+            <input type="password" id="current-password" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+            <input type="password" id="new-password" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Confirm New Password</label>
+            <input type="password" id="confirm-new-password" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg" required>
+          </div>
+          <button type="submit" class="w-full px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">Update Password</button>
+        </form>
+        <div id="password-message" class="mt-4 hidden"></div>
+      </div>
+
+      <!-- Login History -->
+      <div class="bg-white rounded-lg shadow-md p-8">
+        <h3 class="text-lg font-semibold mb-6">Recent Login Activity</h3>
+        <div id="login-history" class="space-y-3">
+          <p class="text-sm text-gray-600">Loading...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="py-10 text-center text-sm text-gray-500 border-t">
+  © 2026 EventNov@. All rights reserved.
+</footer>
+
+<script src="./auth.js"></script>
+
+<script>
+  // API_BASE_URL is already declared in auth.js — redeclaring it here would
+  // throw a duplicate-const SyntaxError and kill this entire script
+
+  // Load profile on page load
+  document.addEventListener('DOMContentLoaded', () => {
+    checkAuth();
+
+    // Show the user's name and ID instantly from the stored login session,
+    // then refresh with fresh data once the profile API responds
+    const cachedUser = getCurrentUser();
+    if (cachedUser) {
+      renderIdentity(cachedUser);
+    }
+
+    loadUserProfile();
+    loadLoginHistory();
+    setupEventListeners();
+  });
+
+  // Check if user is logged in
+  function checkAuth() {
+    if (!isLoggedIn()) {
+      window.location.href = 'get-started.html#login';
+    }
+  }
+
+  // Load user profile
+  async function loadUserProfile() {
+    checkAuth();
+    
+    try {
+      const token = localStorage.getItem('authToken');
+      const response = await fetch(`${API_BASE_URL}/users/profile`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        credentials: 'include'
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        displayProfile(data.user);
+      } else {
+        showProfileError(data.message);
+      }
+    } catch (error) {
+      console.error('Error loading profile:', error);
+      showProfileError('Failed to load profile');
+    }
+  }
+
+  // Render the user's identity (name, ID, email, company) into the welcome banner
+  function renderIdentity(user) {
+    const name = user.fullName || user.full_name || 'User';
+    const userId = user.id || user._id || user.userId || '';
+    const email = user.email || '';
+    const company = user.company || '';
+
+    document.getElementById('welcome-name').textContent = name;
+    document.getElementById('avatar-circle').textContent = getInitials(name);
+
+    const idEl = document.getElementById('user-id');
+    idEl.textContent = userId || 'Not available';
+    idEl.title = userId || '';
+
+    document.getElementById('welcome-email').innerHTML = email ? `✉️ ${escapeHtml(email)}` : '✉️ —';
+    document.getElementById('welcome-company').innerHTML = company ? `🏢 ${escapeHtml(company)}` : '🏢 —';
+  }
+
+  // First letters of the first two name words, for the avatar circle
+  function getInitials(name) {
+    return name.trim().split(/\s+/).slice(0, 2).map(w => w[0].toUpperCase()).join('') || '?';
+  }
+
+  // Copy the user ID to the clipboard with visual feedback
+  async function copyUserId() {
+    const userId = document.getElementById('user-id').textContent;
+    if (!userId || userId === '—' || userId === 'Not available') return;
+
+    try {
+      await navigator.clipboard.writeText(userId);
+    } catch (e) {
+      // Clipboard API may be unavailable (e.g. file://); use the fallback
+      const ta = document.createElement('textarea');
+      ta.value = userId;
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      ta.remove();
+    }
+
+    const btn = document.getElementById('copy-id-btn');
+    btn.textContent = 'Copied!';
+    setTimeout(() => { btn.textContent = 'Copy'; }, 2000);
+  }
+
+  // Display user profile
+  function displayProfile(user) {
+    const profileContent = document.getElementById('profile-content');
+    const userId = user.id || user._id || '';
+    const memberSince = user.createdAt ? new Date(user.createdAt).toLocaleDateString() : '-';
+    const lastLogin = user.lastLogin ? new Date(user.lastLogin).toLocaleString() : 'Never';
+
+    document.getElementById('member-since').textContent = memberSince;
+    document.getElementById('last-login').textContent = lastLogin;
+
+    renderIdentity(user);
+
+    profileContent.innerHTML = `
+      <div class="space-y-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-600 mb-1">Full Name</p>
+            <p class="text-lg font-semibold text-gray-900">${escapeHtml(user.fullName || user.full_name || '—')}</p>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-600 mb-1">Email</p>
+            <p class="text-lg font-semibold text-gray-900">${escapeHtml(user.email || '—')}</p>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-600 mb-1">Company</p>
+            <p class="text-lg font-semibold text-gray-900">${escapeHtml(user.company || '—')}</p>
+          </div>
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <p class="text-sm text-gray-600 mb-1">User ID</p>
+            <p class="text-sm font-mono font-semibold text-gray-900 break-all">${escapeHtml(userId || '—')}</p>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Set values for edit form
+    document.getElementById('edit-fullname').value = user.fullName || user.full_name || '';
+    document.getElementById('edit-company').value = user.company || '';
+  }
+
+  // Show profile error
+  function showProfileError(message) {
+    const profileContent = document.getElementById('profile-content');
+    profileContent.innerHTML = `
+      <div class="bg-red-50 p-4 rounded-lg">
+        <p class="text-red-600">${escapeHtml(message)}</p>
+      </div>
+    `;
+  }
+
+  // Toggle edit profile form
+  function toggleEditProfile() {
+    const form = document.getElementById('edit-profile-form');
+    const btn = document.getElementById('edit-profile-btn');
+    
+    form.classList.toggle('hidden');
+    btn.classList.toggle('hidden');
+  }
+
+  // Save profile changes
+  document.getElementById('profile-update-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const fullName = document.getElementById('edit-fullname').value.trim();
+    const company = document.getElementById('edit-company').value.trim();
+
+    try {
+      const token = localStorage.getItem('authToken');
+      const response = await fetch(`${API_BASE_URL}/users/profile`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({ fullName, company })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        showMessage('profile-message', 'Profile updated successfully', 'success');
+        loadUserProfile();
+        setTimeout(() => toggleEditProfile(), 1500);
+      } else {
+        showMessage('profile-message', data.message || 'Failed to update profile', 'error');
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      showMessage('profile-message', 'Error updating profile', 'error');
+    }
+  });
+
+  // Change password
+  document.getElementById('change-password-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const currentPassword = document.getElementById('current-password').value;
+    const newPassword = document.getElementById('new-password').value;
+    const confirmPassword = document.getElementById('confirm-new-password').value;
+
+    if (newPassword !== confirmPassword) {
+      showMessage('password-message', 'Passwords do not match', 'error');
+      return;
+    }
+
+    if (newPassword.length < 8) {
+      showMessage('password-message', 'Password must be at least 8 characters', 'error');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('authToken');
+      const response = await fetch(`${API_BASE_URL}/users/change-password`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        credentials: 'include',
+        body: JSON.stringify({ currentPassword, newPassword, confirmPassword })
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        showMessage('password-message', 'Password changed successfully', 'success');
+        document.getElementById('change-password-form').reset();
+      } else {
+        showMessage('password-message', data.message || 'Failed to change password', 'error');
+      }
+    } catch (error) {
+      console.error('Error changing password:', error);
+      showMessage('password-message', 'Error changing password', 'error');
+    }
+  });
+
+  // Load login history
+  async function loadLoginHistory() {
+    try {
+      const token = localStorage.getItem('authToken');
+      const response = await fetch(`${API_BASE_URL}/auth/login-history`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        credentials: 'include'
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.loginHistory.length > 0) {
+        displayLoginHistory(data.loginHistory.slice(0, 5)); // Show last 5 logins
+      } else {
+        document.getElementById('login-history').innerHTML = '<p class="text-sm text-gray-600">No login history found</p>';
+      }
+    } catch (error) {
+      console.error('Error loading login history:', error);
+    }
+  }
+
+  // Display login history
+  function displayLoginHistory(history) {
+    const historyDiv = document.getElementById('login-history');
+    historyDiv.innerHTML = history.map(entry => `
+      <div class="bg-gray-50 p-3 rounded-lg text-sm">
+        <p class="font-semibold text-gray-900">${new Date(entry.timestamp).toLocaleString()}</p>
+        <p class="text-gray-600">IP: ${escapeHtml(entry.ipAddress)}</p>
+      </div>
+    `).join('');
+  }
+
+  // Setup event listeners
+  function setupEventListeners() {
+    checkAuth();
+  }
+
+  // Show message helper
+  function showMessage(elementId, text, type) {
+    const messageDiv = document.getElementById(elementId);
+    messageDiv.textContent = text;
+    messageDiv.className = `mt-4 p-3 rounded ${type === 'success' ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'}`;
+    messageDiv.classList.remove('hidden');
+  }
+
+  // Escape HTML to prevent XSS
+  function escapeHtml(text) {
+    const map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
+  }
+</script>
+
+</body>
+</html>

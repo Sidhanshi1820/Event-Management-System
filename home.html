@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>EventNov@ - Home</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Your external CSS -->
+  <link rel="stylesheet" href="style.css" />
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: "#0B1C2D",
+            bluebg: "#F3F5F7",
+            bluebg: "#2B2E34",
+            accent: "#2EC4B6"
+          },
+          fontFamily: {
+            sans: ["Inter", "system-ui", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Enhanced buttons */
+    .btn-primary {
+      background-color: #2EC4B6;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 8px rgba(46, 196, 182, 0.2);
+    }
+    .btn-primary:hover {
+      background-color: #26a69a;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(46, 196, 182, 0.3);
+    }
+
+    /* Card styles */
+    .card {
+      background: white;
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Hero background with video */
+    .hero-bg {
+      position: relative;
+      overflow: hidden;
+      color: white;
+      height: 100vh; /* Full viewport height for immersive effect */
+    }
+    .hero-bg video {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      z-index: -1;
+    }
+    .hero-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.4); /* Semi-transparent overlay for text readability */
+      z-index: 0;
+    }
+    .hero-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      text-align: center;
+    }
+
+    /* Service card icon */
+    .section-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 3.5rem;
+      height: 3.5rem;
+      font-size: 1.75rem;
+      border-radius: 9999px;
+      background-color: rgba(46, 196, 182, 0.12);
+    }
+
+    /* Service feature list */
+    .feature-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.4rem;
+    }
+
+    .feature-list li::before {
+      content: "✓";
+      color: #2EC4B6;
+      font-weight: 700;
+    }
+
+    /* FAQ accordion */
+    details.faq-item summary {
+      cursor: pointer;
+      list-style: none;
+    }
+
+    details.faq-item summary::-webkit-details-marker {
+      display: none;
+    }
+
+    details.faq-item summary::after {
+      content: "+";
+      float: right;
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #2EC4B6;
+      transition: transform 0.3s ease;
+    }
+
+    details.faq-item[open] summary::after {
+      transform: rotate(45deg);
+    }
+
+    /* Slider styles */
+    .slider {
+      max-width: 100%;
+      position: relative;
+      overflow: hidden;
+      border-radius: 0.75rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }    .slides {
+      display: flex;
+      transition: transform 0.5s ease-in-out;
+    }
+    .slide {
+      min-width: 100%;
+    }
+    .slide img {
+      width: 100%;
+      height: 400px;
+      object-fit: cover;
+    }
+    .slider-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.8);
+      border: none;
+      color: lch(25.98% 99.35 306);
+      padding: 0.5rem;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.25rem;
+    }
+    .slider-btn.prev { left: 1rem; }
+    .slider-btn.next { right: 1rem; }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .hero-bg {
+        height: 80vh; /* Adjust height on mobile */
+      }
+      .hero-content h1 {
+        font-size: 2.5rem;
+      }
+      .slide img { height: 250px; }
+    }
+  </style>
+</head>
+
+<body class="font-sans text-gray-800">
+
+<!-- Header -->
+<header class="bg-white shadow-md sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
+    <div class="flex items-center">
+      <img src="99.jpg" alt="Logo" class="h-12 w-22 mr-4">
+      <h1 class="text-2xl font-bold text-navy">EventNov@</h1>
+    </div>
+    <nav class="space-x-6 hidden md:block text-sm">
+      <a href="home.html">Home</a>
+      <a href="services.html">Services</a>
+      <a href="about.html">About</a>
+      <a href="get-started.html#login">Login</a>
+      <a href="get-started.html#register">Register</a>
+    </nav>
+  </div>
+</header>
+
+<!-- Hero Section with Background Video -->
+<section id="home" class="relative min-h-screen flex items-center justify-center overflow-hidden">
+  <video autoplay loop muted playsinline class="absolute z-0 min-w-full min-h-full object-cover">
+    <source src="88.mp4" type="video/mp4">
+    <img src="https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1200&q=80" alt="Corporate Event Background">
+  </video>
+
+  <div class="absolute z-10 inset-0 bg-black/50"></div>
+
+  <div class="relative z-20 hero-content max-w-4xl mx-auto px-4 text-center text-white">
+    <h1 class="text-5xl font-bold mb-6">Future-Ready Corporate Events</h1>
+    <p class="text-xl mb-8">
+      Intelligent seminars, conferences, product launches, and hybrid events for modern enterprises.
+    </p>
+    <a href="get-started.html" class="btn-primary inline-block bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition">
+      Get Started
+    </a>
+  </div>
+</section>
+
+<!-- Trust Stats Strip -->
+<section class="bg-navy text-white py-10">
+  <div class="max-w-6xl mx-auto px-4 grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+    <div>
+      <p class="text-3xl font-bold text-accent">500+</p>
+      <p class="text-sm text-white/80 mt-1">Corporate Events Organized</p>
+    </div>
+    <div>
+      <p class="text-3xl font-bold text-accent">150+</p>
+      <p class="text-sm text-white/80 mt-1">Happy Corporate Clients</p>
+    </div>
+    <div>
+      <p class="text-3xl font-bold text-accent">12</p>
+      <p class="text-sm text-white/80 mt-1">Corporate Event Types</p>
+    </div>
+    <div>
+      <p class="text-3xl font-bold text-accent">4.9 <span class="text-yellow-400">★</span></p>
+      <p class="text-sm text-white/80 mt-1">Average Client Rating</p>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- About Section -->
+<section id="about" class="py-16 bg-white">
+  <div class="max-w-6xl mx-auto px-4 text-center">
+    <h2 class="text-3xl font-bold text-navy mb-8">About Us</h2>
+    <p class="text-lg text-gray-600 mb-8">Corporate Event Solutions specializes in creating innovative and impactful events tailored to the needs of modern businesses. From virtual conferences to in-person product launches, we ensure seamless execution and measurable results.</p>
+    <div class="grid md:grid-cols-3 gap-8">
+      <div class="card p-6">
+        <h3 class="text-xl font-semibold mb-4">Our Mission</h3>
+        <p>To revolutionize corporate event management through technology and creativity.</p>
+      </div>
+      <div class="card p-6">
+        <h3 class="text-xl font-semibold mb-4">Our Vision</h3>
+        <p>Leading the industry in hybrid and virtual event solutions.</p>
+      </div>
+      <div class="card p-6">
+        <h3 class="text-xl font-semibold mb-4">Our Values</h3>
+        <p>Innovation, integrity, and excellence in every event we deliver.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Slider Section -->
+<section class="py-12 bg-gray-100">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="slider">
+      <div class="slides">
+        <div class="slide"><img src="https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1200&q=80" alt="Conference Room"></div>
+        <div class="slide"><img src="https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&w=1200&q=80" alt="Product Launch"></div>
+        <div class="slide"><img src="https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=1200&q=80" alt="Hybrid Event"></div>
+      </div>
+      <button class="slider-btn prev" onclick="prevSlide()">&#10094;</button>
+      <button class="slider-btn next" onclick="nextSlide()">&#10095;</button>
+    </div>
+  </div>
+</section>
+
+<!-- Services Section -->
+<section id="services" class="py-16 bg-gray-100">
+  <div class="max-w-6xl mx-auto px-4">
+    <h2 class="text-3xl font-bold text-navy text-center mb-3">Our Corporate Event Services</h2>
+    <p class="text-center text-gray-600 mb-10">End-to-end services for every type of corporate event — and nothing else.</p>
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+
+      <div class="card p-6 flex flex-col">
+        <div class="section-icon mb-4">🎤</div>
+        <h3 class="text-xl font-semibold mb-2">Event Planning</h3>
+        <p class="text-gray-600 mb-3">End-to-end management of corporate events of every scale, from concept to wrap-up.</p>
+        <ul class="feature-list text-sm text-gray-600 space-y-1 mb-4">
+          <li>Venue sourcing &amp; logistics</li>
+          <li>Agenda &amp; speaker management</li>
+          <li>On-site coordination</li>
+        </ul>
+        <div class="mt-auto flex items-center justify-between border-t pt-4">
+          <div>
+            <p class="text-sm"><span class="text-amber-500">★★★★★</span> <span class="text-gray-500">4.9 (214)</span></p>
+            <p class="text-sm font-semibold text-navy mt-0.5">From ₹1,50,000</p>
+          </div>
+          <a href="contact.html" class="text-sm text-accent font-semibold hover:underline">Get Quote →</a>
+        </div>
+      </div>
+
+      <div class="card p-6 flex flex-col">
+        <div class="section-icon mb-4">💻</div>
+        <h3 class="text-xl font-semibold mb-2">Virtual &amp; Hybrid Events</h3>
+        <p class="text-gray-600 mb-3">Seamless virtual, hybrid and webcast experiences for distributed corporate teams.</p>
+        <ul class="feature-list text-sm text-gray-600 space-y-1 mb-4">
+          <li>Live streaming &amp; recording</li>
+          <li>Virtual attendee engagement</li>
+          <li>Hybrid AV integration</li>
+        </ul>
+        <div class="mt-auto flex items-center justify-between border-t pt-4">
+          <div>
+            <p class="text-sm"><span class="text-amber-500">★★★★★</span> <span class="text-gray-500">4.8 (96)</span></p>
+            <p class="text-sm font-semibold text-navy mt-0.5">From ₹75,000</p>
+          </div>
+          <a href="contact.html" class="text-sm text-accent font-semibold hover:underline">Get Quote →</a>
+        </div>
+      </div>
+
+      <div class="card p-6 flex flex-col">
+        <div class="section-icon mb-4">📊</div>
+        <h3 class="text-xl font-semibold mb-2">Analytics &amp; Reporting</h3>
+        <p class="text-gray-600 mb-3">Data-driven insights that prove event ROI to your leadership team.</p>
+        <ul class="feature-list text-sm text-gray-600 space-y-1 mb-4">
+          <li>Attendance &amp; engagement metrics</li>
+          <li>ROI dashboards</li>
+          <li>Post-event reports</li>
+        </ul>
+        <div class="mt-auto flex items-center justify-between border-t pt-4">
+          <div>
+            <p class="text-sm"><span class="text-amber-500">★★★★★</span> <span class="text-gray-500">4.9 (61)</span></p>
+            <p class="text-sm font-semibold text-navy mt-0.5">From ₹40,000</p>
+          </div>
+          <a href="contact.html" class="text-sm text-accent font-semibold hover:underline">Get Quote →</a>
+        </div>
+      </div>
+
+      <div class="card p-6 flex flex-col">
+        <div class="section-icon mb-4">🍽️</div>
+        <h3 class="text-xl font-semibold mb-2">Corporate Catering</h3>
+        <p class="text-gray-600 mb-3">Customized catering for boardroom lunches to 5,000-guest conference banquets.</p>
+        <ul class="feature-list text-sm text-gray-600 space-y-1 mb-4">
+          <li>Custom corporate menus</li>
+          <li>Dietary &amp; cultural options</li>
+          <li>Service staff &amp; logistics</li>
+        </ul>
+        <div class="mt-auto flex items-center justify-between border-t pt-4">
+          <div>
+            <p class="text-sm"><span class="text-amber-500">★★★★★</span> <span class="text-gray-500">4.8 (178)</span></p>
+            <p class="text-sm font-semibold text-navy mt-0.5">From ₹850/plate</p>
+          </div>
+          <a href="contact.html" class="text-sm text-accent font-semibold hover:underline">Get Quote →</a>
+        </div>
+      </div>
+
+      <div class="card p-6 flex flex-col">
+        <div class="section-icon mb-4">🎥</div>
+        <h3 class="text-xl font-semibold mb-2">AV Production</h3>
+        <p class="text-gray-600 mb-3">State-of-the-art audio-visual production that makes corporate stages shine.</p>
+        <ul class="feature-list text-sm text-gray-600 space-y-1 mb-4">
+          <li>Stage, sound &amp; lighting</li>
+          <li>LED walls &amp; livestream gear</li>
+          <li>Experienced technical crew</li>
+        </ul>
+        <div class="mt-auto flex items-center justify-between border-t pt-4">
+          <div>
+            <p class="text-sm"><span class="text-amber-500">★★★★★</span> <span class="text-gray-500">4.9 (132)</span></p>
+            <p class="text-sm font-semibold text-navy mt-0.5">From ₹90,000</p>
+          </div>
+          <a href="contact.html" class="text-sm text-accent font-semibold hover:underline">Get Quote →</a>
+        </div>
+      </div>
+
+      <div class="card p-6 flex flex-col">
+        <div class="section-icon mb-4">💼</div>
+        <h3 class="text-xl font-semibold mb-2">Event Consulting</h3>
+        <p class="text-gray-600 mb-3">Expert strategy for companies planning their corporate event calendar.</p>
+        <ul class="feature-list text-sm text-gray-600 space-y-1 mb-4">
+          <li>Budget planning &amp; negotiation</li>
+          <li>Event strategy &amp; branding</li>
+          <li>Risk &amp; compliance guidance</li>
+        </ul>
+        <div class="mt-auto flex items-center justify-between border-t pt-4">
+          <div>
+            <p class="text-sm"><span class="text-amber-500">★★★★★</span> <span class="text-gray-500">5.0 (47)</span></p>
+            <p class="text-sm font-semibold text-navy mt-0.5">From ₹35,000</p>
+          </div>
+          <a href="contact.html" class="text-sm text-accent font-semibold hover:underline">Get Quote →</a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="py-16 bg-white">
+  <div class="max-w-6xl mx-auto px-4">
+    <h2 class="text-3xl font-bold text-navy text-center mb-3">What Corporate Clients Say</h2>
+    <p class="text-center text-gray-600 mb-10">Verified reviews from teams we've organized events for.</p>
+    <div class="grid md:grid-cols-3 gap-8">
+
+      <div class="card p-6">
+        <p class="text-amber-500 mb-3">★★★★★</p>
+        <p class="text-gray-600 mb-4">"They handled our 1,200-delegate annual conference end to end — agenda, AV, catering, analytics. Flawless execution and a proper ROI report afterwards."</p>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center font-bold text-teal-700">AK</div>
+          <div>
+            <p class="font-semibold text-navy text-sm">Ananya Kapoor</p>
+            <p class="text-xs text-gray-500">Head of Marketing · TechNova · Annual Conference</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card p-6">
+        <p class="text-amber-500 mb-3">★★★★★</p>
+        <p class="text-gray-600 mb-4">"Our product launch looked like a global keynote — LED stage, livestream, press management. Worth every rupee and delivered on budget."</p>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center font-bold text-teal-700">RV</div>
+          <div>
+            <p class="font-semibold text-navy text-sm">Rohit Verma</p>
+            <p class="text-xs text-gray-500">Product Director · FinEdge · Product Launch</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card p-6">
+        <p class="text-amber-500 mb-3">★★★★★</p>
+        <p class="text-gray-600 mb-4">"Quarterly workshops, team offsites, board meetings — one partner for our whole corporate calendar. Their team just gets corporate."</p>
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center font-bold text-teal-700">SM</div>
+          <div>
+            <p class="font-semibold text-navy text-sm">Sneha Mehta</p>
+            <p class="text-xs text-gray-500">HR Director · Zenith Group · Training Series</p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- FAQ Section -->
+<section class="py-16 bg-gray-100">
+  <div class="max-w-3xl mx-auto px-4">
+    <h2 class="text-3xl font-bold text-navy text-center mb-3">Frequently Asked Questions</h2>
+    <p class="text-center text-gray-600 mb-10">Everything corporate event organizers usually ask us.</p>
+    <div class="space-y-4">
+
+      <details class="faq-item card p-5">
+        <summary class="font-semibold text-navy pr-6">How much does a corporate event cost?</summary>
+        <p class="text-gray-600 mt-3 text-sm leading-relaxed">Seminars, workshops and webinars typically start from ₹35,000–₹75,000. Conferences, product launches and galas usually range from ₹1,50,000 to ₹10,00,000+ depending on scale, venue and production. Every quote is itemized — no hidden charges.</p>
+      </details>
+
+      <details class="faq-item card p-5">
+        <summary class="font-semibold text-navy pr-6">Do you organize only corporate events?</summary>
+        <p class="text-gray-600 mt-3 text-sm leading-relaxed">Yes — exclusively. We handle all types of corporate events (conferences, seminars, product launches, trade shows, galas, retreats, team building and more) and deliberately don't take on weddings or private parties, so our entire team and vendor network is corporate-focused.</p>
+      </details>
+
+      <details class="faq-item card p-5">
+        <summary class="font-semibold text-navy pr-6">How far in advance should we book?</summary>
+        <p class="text-gray-600 mt-3 text-sm leading-relaxed">For workshops, webinars and team events, 3–4 weeks is usually enough. For large conferences, trade shows and product launches we recommend 3+ months so you get the best venues and production slots.</p>
+      </details>
+
+      <details class="faq-item card p-5">
+        <summary class="font-semibold text-navy pr-6">Do you handle virtual and hybrid formats?</summary>
+        <p class="text-gray-600 mt-3 text-sm leading-relaxed">Yes. We produce webinars, fully virtual conferences and hybrid events with live streaming, virtual attendee engagement tools and integrated AV for in-room and online audiences.</p>
+      </details>
+
+      <details class="faq-item card p-5">
+        <summary class="font-semibold text-navy pr-6">Which locations do you serve?</summary>
+        <p class="text-gray-600 mt-3 text-sm leading-relaxed">We organize corporate events pan-India across 25+ cities — including Delhi NCR (Noida, Greater Noida, Gurugram, Delhi), Mumbai, Bengaluru, Hyderabad, Pune and Chennai — plus fully virtual events anywhere.</p>
+      </details>
+
+      <details class="faq-item card p-5">
+        <summary class="font-semibold text-navy pr-6">How do I get a quote?</summary>
+        <p class="text-gray-600 mt-3 text-sm leading-relaxed">Click <a href="get-started.html" class="text-accent font-semibold hover:underline">Get Started</a>, create your free account and submit the booking form with your requirements. Our team responds within 24 hours with a detailed proposal and pricing.</p>
+      </details>
+
+    </div>
+  </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact" class="py-16 bg-white">
+  <div class="max-w-6xl mx-auto px-4 text-center">
+    <h2 class="text-3xl font-bold text-navy mb-8">Contact Us</h2>
+    <div class="grid md:grid-cols-3 gap-8">
+      <div class="card p-6">
+        <h3 class="text-xl font-semibold mb-4">Our App</h3>
+        <p class="mb-4">Download our app for easy event management.</p>
+        <a href="#" class="btn-primary">Download</a>
+      </div>
+      <div class="card p-6">
+        <h3 class="text-xl font-semibold mb-4">Help Line</h3>
+        <p class="mb-4">Call us for support.</p>
+        <p class="text-accent font-bold">+1 (800) 123-4567</p>
+      </div>
+      <div class="card p-6">
+        <h3 class="text-xl font-semibold mb-4">Email</h3>
+        <p class="mb-4">Send us an email.</p>
+        <p class="text-accent font-bold">support@eventnov@.com</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="bg-navy text-white py-8">
+  <div class="max-w-6xl mx-auto px-4 text-center">
+    <p>&copy; 2026 Corporate Event Solutions. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+  let currentSlide = 0;
+  const slides = document.querySelectorAll('.slide');
+  const totalSlides = slides.length;
+
+  function showSlide(index) {
+    const slider = document.querySelector('.slides');
+    slider.style.transform = `translateX(-${index * 100}%)`;
+    currentSlide = index;
+  }
+
+  function nextSlide() {
+    currentSlide = (currentSlide + 1) % totalSlides;
+    showSlide(currentSlide);
+  }
+
+  function prevSlide() {
+    currentSlide = (currentSlide - 1 + totalSlides) % totalSlides;
+    showSlide(currentSlide);
+  }
+
+  // Auto slide
+  setInterval(nextSlide, 5000);
+</script>
+
+</body>
+</html>

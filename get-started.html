@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Get Started - EventNov@</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Sign in or create your EventNov@ account to start planning corporate events." />
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Your external CSS -->
+  <link rel="stylesheet" href="style.css" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: "#0B1C2D",
+            greybg: "#F3F5F7",
+            charcoal: "#2B2E34",
+            accent: "#2EC4B6"
+          },
+          fontFamily: {
+            sans: ["Inter", "system-ui", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Form enhancements */
+    .form-input {
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .form-input:focus {
+      border-color: #2EC4B6;
+      box-shadow: 0 0 0 3px rgba(46, 196, 182, 0.1);
+    }
+
+    .btn-submit {
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(46, 196, 182, 0.2);
+    }
+
+    .btn-submit:hover {
+      box-shadow: 0 6px 20px rgba(46, 196, 182, 0.4);
+      transform: translateY(-2px);
+    }
+
+    /* Login / Register tab switcher */
+    .tab-btn {
+      color: #4b5563;
+      transition: all 0.3s ease;
+    }
+
+    .tab-btn.tab-active {
+      background-color: #2EC4B6;
+      color: white;
+      box-shadow: 0 4px 12px rgba(46, 196, 182, 0.3);
+    }
+
+    /* Hamburger menu */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+    }
+
+    .hamburger span {
+      width: 25px;
+      height: 3px;
+      background-color: #0B1C2D;
+      margin: 3px 0;
+      transition: 0.3s;
+    }
+
+    .hamburger.active span:nth-child(1) {
+      transform: rotate(-45deg) translate(-5px, 6px);
+    }
+
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.active span:nth-child(3) {
+      transform: rotate(45deg) translate(-5px, -6px);
+    }
+
+    .nav-menu {
+      display: flex;
+    }
+
+    .nav-menu.mobile {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background-color: white;
+      flex-direction: column;
+      padding: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-menu.mobile.active {
+      display: flex;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hamburger {
+        display: flex;
+      }
+      .nav-menu {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body class="font-sans text-charcoal bg-greybg">
+
+<header class="fixed w-full bg-white/90 backdrop-blur border-b z-50">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    <a href="home.html" class="text-xl font-semibold text-navy">EventNov@</a>
+    <nav class="space-x-6 hidden md:flex text-sm">
+      <a href="home.html" class="hover:text-accent transition">Home</a>
+      <a href="events.html" class="hover:text-accent transition">Event Types</a>
+      <a href="services.html" class="hover:text-accent transition">Services</a>
+      <a href="about.html" class="hover:text-accent transition">About</a>
+      <a href="contact.html" class="hover:text-accent transition">Contact</a>
+    </nav>
+    <!-- Mobile hamburger menu -->
+    <div class="hamburger md:hidden" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <nav class="nav-menu mobile" id="nav-menu">
+      <a href="home.html" class="py-2 hover:text-accent transition">Home</a>
+      <a href="events.html" class="py-2 hover:text-accent transition">Event Types</a>
+      <a href="services.html" class="py-2 hover:text-accent transition">Services</a>
+      <a href="about.html" class="py-2 hover:text-accent transition">About</a>
+      <a href="contact.html" class="py-2 hover:text-accent transition">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<section class="pt-40 pb-10 bg-greybg text-center">
+  <h1 class="text-4xl md:text-5xl font-bold text-navy mb-4">Get Started with EventNov@</h1>
+  <p class="max-w-2xl mx-auto text-lg text-gray-600 px-4">
+    Sign in to your account or create a new one to start planning and managing corporate events effortlessly.
+  </p>
+</section>
+
+<section class="pb-20 bg-greybg">
+  <div class="max-w-md mx-auto px-6">
+    <div class="bg-white p-8 rounded-xl shadow-lg">
+      <!-- Already signed in notice -->
+      <div id="signed-in-notice" class="hidden mb-6 p-4 bg-teal-50 border border-teal-200 rounded-lg text-sm text-teal-800 text-center">
+        You're already signed in. <a href="dashboard.html" class="font-semibold underline">Go to your dashboard</a>
+      </div>
+
+      <!-- Tab switcher -->
+      <div class="flex bg-gray-100 rounded-full p-1 mb-8" role="tablist" aria-label="Login or Register">
+        <button type="button" id="tab-login" role="tab" aria-controls="login-panel"
+                class="tab-btn flex-1 py-2.5 px-4 rounded-full text-sm font-semibold"
+                onclick="showTab('login')">Login</button>
+        <button type="button" id="tab-register" role="tab" aria-controls="register-panel"
+                class="tab-btn flex-1 py-2.5 px-4 rounded-full text-sm font-semibold"
+                onclick="showTab('register')">Register</button>
+      </div>
+
+      <!-- Login panel -->
+      <div id="login-panel" role="tabpanel">
+        <h2 class="text-2xl font-semibold text-navy mb-6 text-center">Welcome Back</h2>
+        <form action="#" method="POST" id="login-form" class="space-y-6">
+          <div>
+            <label for="login-email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <input type="email" id="login-email" name="email" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Enter your email" required>
+          </div>
+          <div>
+            <label for="login-password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+            <input type="password" id="login-password" name="password" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Enter your password" required>
+          </div>
+          <div class="flex items-center justify-between">
+            <label class="flex items-center">
+              <input type="checkbox" id="login-remember" name="remember" class="mr-2">
+              <span class="text-sm text-gray-600">Remember me</span>
+            </label>
+            <a href="#" class="text-sm text-accent hover:underline">Forgot password?</a>
+          </div>
+          <button type="submit" class="btn-submit w-full bg-navy text-white py-3 px-6 rounded-lg font-semibold hover:bg-opacity-90">Login</button>
+          <div class="form-message mt-4 text-center hidden"></div>
+          <p class="text-center text-sm text-gray-600">
+            Don't have an account? <a href="#register" class="text-accent hover:underline font-semibold">Register here</a>
+          </p>
+        </form>
+      </div>
+
+      <!-- Register panel -->
+      <div id="register-panel" role="tabpanel" class="hidden">
+        <h2 class="text-2xl font-semibold text-navy mb-6 text-center">Create Your Account</h2>
+        <form action="#" method="POST" id="register-form" class="space-y-6">
+          <div>
+            <label for="register-full-name" class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+            <input type="text" id="register-full-name" name="full_name" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Enter your full name" required>
+          </div>
+          <div>
+            <label for="register-email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <input type="email" id="register-email" name="email" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Enter your email" required>
+          </div>
+          <div>
+            <label for="register-company" class="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
+            <input type="text" id="register-company" name="company" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Enter your company name" required>
+          </div>
+          <div>
+            <label for="register-password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+            <input type="password" id="register-password" name="password" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Create a password" required minlength="8">
+          </div>
+          <div>
+            <label for="register-confirm-password" class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+            <input type="password" id="register-confirm-password" name="confirm_password" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Confirm your password" required>
+          </div>
+          <div class="flex items-start">
+            <input type="checkbox" id="register-terms" name="terms" class="mr-2 mt-1" required>
+            <label for="register-terms" class="text-sm text-gray-600">
+              I agree to the <a href="#" class="text-accent hover:underline">Terms of Service</a> and <a href="#" class="text-accent hover:underline">Privacy Policy</a>.
+            </label>
+          </div>
+          <button type="submit" class="btn-submit w-full bg-navy text-white py-3 px-6 rounded-lg font-semibold hover:bg-opacity-90">Register</button>
+          <div class="form-message mt-4 text-center hidden"></div>
+          <p class="text-center text-sm text-gray-600">
+            Already have an account? <a href="#login" class="text-accent hover:underline font-semibold">Sign in here</a>
+          </p>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer class="py-10 text-center text-sm text-gray-500 border-t bg-white">
+  © 2026 EventNov@. All rights reserved. <a href="#" class="hover:text-accent">Privacy Policy</a> | <a href="#" class="hover:text-accent">Terms of Service</a>
+</footer>
+
+<script>
+  // Hamburger menu toggle
+  const hamburger = document.getElementById('hamburger');
+  const navMenu = document.getElementById('nav-menu');
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('active');
+    navMenu.classList.toggle('active');
+  });
+
+  // Login / Register tab switching
+  const loginPanel = document.getElementById('login-panel');
+  const registerPanel = document.getElementById('register-panel');
+  const tabLogin = document.getElementById('tab-login');
+  const tabRegister = document.getElementById('tab-register');
+
+  function showTab(tab) {
+    const isLogin = tab === 'login';
+    loginPanel.classList.toggle('hidden', !isLogin);
+    registerPanel.classList.toggle('hidden', isLogin);
+    tabLogin.classList.toggle('tab-active', isLogin);
+    tabRegister.classList.toggle('tab-active', !isLogin);
+    tabLogin.setAttribute('aria-selected', isLogin);
+    tabRegister.setAttribute('aria-selected', !isLogin);
+    if (location.hash !== `#${tab}`) {
+      history.replaceState(null, '', `#${tab}`);
+    }
+  }
+
+  // Default to Register for "Get Started", unless #login is requested
+  showTab(location.hash === '#login' ? 'login' : 'register');
+  window.addEventListener('hashchange', () => {
+    showTab(location.hash === '#login' ? 'login' : 'register');
+  });
+
+  // Show a notice if the visitor is already signed in
+  if (localStorage.getItem('authToken')) {
+    const notice = document.getElementById('signed-in-notice');
+    const user = JSON.parse(localStorage.getItem('userData') || 'null');
+    if (user && user.full_name) {
+      notice.textContent = `You're already signed in as ${user.full_name}. `;
+      const link = document.createElement('a');
+      link.href = 'dashboard.html';
+      link.className = 'font-semibold underline';
+      link.textContent = 'Go to your dashboard';
+      notice.appendChild(link);
+    }
+    notice.classList.remove('hidden');
+  }
+</script>
+
+<!-- Authentication Script -->
+<script src="./auth.js"></script>
+
+</body>
+</html>

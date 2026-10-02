@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login - EventNov@</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Login to your EventNov@ account." />
+  
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Your external CSS -->
+  <link rel="stylesheet" href="style.css" />
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: "#0B1C2D",
+            greybg: "#F3F5F7",
+            charcoal: "#2B2E34",
+            accent: "#2EC4B6"
+          },
+          fontFamily: {
+            sans: ["Inter", "system-ui", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Form enhancements */
+    .form-input {
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .form-input:focus {
+      border-color: #2EC4B6;
+      box-shadow: 0 0 0 3px rgba(46, 196, 182, 0.1);
+    }
+
+    .btn-submit {
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 12px rgba(46, 196, 182, 0.2);
+    }
+
+    .btn-submit:hover {
+      box-shadow: 0 6px 20px rgba(46, 196, 182, 0.4);
+      transform: translateY(-2px);
+    }
+
+    /* Slider container */
+    .slider {
+      max-width: 100%;
+      position: relative;
+      overflow: hidden;
+      border-radius: 1rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .slides {
+      display: flex;
+      transition: transform 0.5s ease-in-out;
+    }
+
+    .slide {
+      min-width: 100%;
+      user-select: none;
+    }
+
+    .slide img {
+      width: 100%;
+      display: block;
+      border-radius: 1rem;
+      object-fit: cover;
+      height: 700px;
+      loading: lazy;
+    }
+
+    /* Slider indicators */
+    .indicators {
+      position: absolute;
+      bottom: 1rem;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .indicator {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background-color: rgba(255, 255, 255, 0.5);
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    .indicator.active {
+      background-color: white;
+    }
+
+    /* Hamburger menu */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+    }
+
+    .hamburger span {
+      width: 25px;
+      height: 3px;
+      background-color: #0B1C2D;
+      margin: 3px 0;
+      transition: 0.3s;
+    }
+
+    .hamburger.active span:nth-child(1) {
+      transform: rotate(-45deg) translate(-5px, 6px);
+    }
+
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.active span:nth-child(3) {
+      transform: rotate(45deg) translate(-5px, -6px);
+    }
+
+    .nav-menu {
+      display: flex;
+    }
+
+    .nav-menu.mobile {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background-color: white;
+      flex-direction: column;
+      padding: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-menu.mobile.active {
+      display: flex;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hamburger {
+        display: flex;
+      }
+      .nav-menu {
+        display: none;
+      }
+      .nav-menu.mobile {
+        display: none;
+      }
+      .nav-menu.mobile.active {
+        display: flex;
+      }
+      .slide img {
+        height: 200px;
+      }
+    }
+  </style>
+</head>
+
+<body class="font-sans text-charcoal bg-greybg">
+
+<header class="fixed w-full bg-white/90 backdrop-blur border-b z-50">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    <a href="home.html" class="text-xl font-semibold text-navy">EventNov@</a>
+    <nav class="space-x-6 hidden md:flex text-sm">
+      <a href="services.html" class="hover:text-accent transition">Services</a>
+      <a href="solutions.html" class="hover:text-accent transition">Solutions</a>
+      <a href="case-studies.html" class="hover:text-accent transition">Case Studies</a>
+      <a href="about.html" class="hover:text-accent transition">About</a>
+      <a href="contact.html" class="hover:text-accent transition">Contact</a>
+      <a href="login.html" class="hover:text-accent transition">Login</a>
+    </nav>
+    <!-- Mobile hamburger menu -->
+    <div class="hamburger md:hidden" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <nav class="nav-menu mobile" id="nav-menu">
+      <a href="services.html" class="py-2 hover:text-accent transition">Services</a>
+      <a href="solutions.html" class="py-2 hover:text-accent transition">Solutions</a>
+      <a href="case-studies.html" class="py-2 hover:text-accent transition">Case Studies</a>
+      <a href="about.html" class="py-2 hover:text-accent transition">About</a>
+      <a href="contact.html" class="py-2 hover:text-accent transition">Contact</a>
+      <a href="login.html" class="py-2 hover:text-accent transition">Login</a>
+    </nav>
+  </div>
+</header>
+
+<section class="pt-44 pb-16 bg-greybg text-center">
+  <h1 class="text-4xl md:text-5xl font-bold text-navy mb-4">Login to Your Account</h1>
+  <p class="max-w-2xl mx-auto text-lg text-gray-600">
+    Access your dashboard to manage events, view proposals, and more.
+  </p>
+</section>
+
+<section class="py-16 bg-white">
+  <div class="max-w-md mx-auto px-6">
+    <div class="bg-white p-8 rounded-xl shadow-lg">
+      <h2 class="text-2xl font-semibold text-navy mb-6 text-center">Sign In</h2>
+      <form action="#" method="POST" id="login-form" class="space-y-6">
+        <div>
+          <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+          <input type="email" id="email" name="email" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Enter your email" required>
+        </div>
+        <div>
+          <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Password</label>
+          <input type="password" id="password" name="password" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Enter your password" required>
+        </div>
+        <div class="flex items-center justify-between">
+          <label class="flex items-center">
+            <input type="checkbox" id="remember" name="remember" class="mr-2">
+            <span class="text-sm text-gray-600">Remember me</span>
+          </label>
+          <a href="#" class="text-sm text-accent hover:underline">Forgot password?</a>
+        </div>
+        <button type="submit" class="btn-submit w-full bg-navy text-white py-3 px-6 rounded-lg font-semibold hover:bg-opacity-90">Login</button>
+      </form>
+      <div id="form-message" class="mt-4 text-center hidden"></div>
+      <p class="mt-6 text-center text-sm text-gray-600">
+        Don't have an account? <a href="register.html" class="text-accent hover:underline">Sign up here</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Image Slider Section -->
+<section class="py-12 bg-white">
+  <div class="slider" aria-label="Corporate Events Image Slider">
+    <div class="slides">
+      <div class="slide"><img src="https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=900&q=80" alt="Modern Corporate Conference Room" /></div>
+      <div class="slide"><img src="https://images.unsplash.com/photo-1515187029135-18ee286d815b?auto=format&fit=crop&w=900&q=80" alt="Product Launch Presentation" /></div>
+      <div class="slide"><img src="https://images.unsplash.com/photo-1559136555-9303baea8ebd?auto=format&fit=crop&w=900&q=80" alt="Hybrid Event Setup with Screens" /></div>
+      <div class="slide"><img src="https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=900&q=80" alt="Corporate Seminar" /></div>
+    </div>
+    <div class="indicators">
+      <div class="indicator active" data-slide="0"></div>
+      <div class="indicator" data-slide="1"></div>
+      <div class="indicator" data-slide="2"></div>
+      <div class="indicator" data-slide="3"></div>
+    </div>
+  </div>
+</section>
+
+<footer class="py-10 text-center text-sm text-gray-500 border-t">
+  © 2026 EventNov@. All rights reserved. <a href="#" class="hover:text-accent">Privacy Policy</a> | <a href="#" class="hover:text-accent">Terms of Service</a>
+</footer>
+
+<script>
+  // Hamburger menu toggle
+  const hamburger = document.getElementById('hamburger');
+  const navMenu = document.getElementById('nav-menu');
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('active');
+    navMenu.classList.toggle('active');
+  });
+
+  // Slider functionality
+  const slides = document.querySelector('.slides');
+  const slideCount = slides.children.length;
+  const indicators = document.querySelectorAll('.indicator');
+  let currentIndex = 0;
+  let autoSlideInterval;
+
+  function showSlide(index) {
+    if (index < 0) {
+      currentIndex = slideCount - 1;
+    } else if (index >= slideCount) {
+      currentIndex = 0;
+    } else {
+      currentIndex = index;
+    }
+    slides.style.transform = `translateX(-${currentIndex * 100}%)`;
+    updateIndicators();
+  }
+
+  function updateIndicators() {
+    indicators.forEach((indicator, i) => {
+      indicator.classList.toggle('active', i === currentIndex);
+    });
+  }
+
+  function startAutoSlide() {
+    autoSlideInterval = setInterval(() => {
+      showSlide(currentIndex + 1);
+    }, 5000);
+  }
+
+  function stopAutoSlide() {
+    clearInterval(autoSlideInterval);
+  }
+
+  indicators.forEach((indicator, i) => {
+    indicator.addEventListener('click', () => {
+      stopAutoSlide();
+      showSlide(i);
+      startAutoSlide();
+    });
+  });
+
+  // Start auto slide
+  startAutoSlide();
+
+</script>
+
+<!-- Authentication Script -->
+<script src="./auth.js"></script>
+
+</body>
+</html>

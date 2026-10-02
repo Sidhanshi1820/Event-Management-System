@@ -1,0 +1,189 @@
+/* =========================
+   ROOT COLORS & VARIABLES
+========================= */
+:root {
+  --navy: #0B1C2D;
+  --navy-dark: #07131F;
+  --blue-bg: #105dab;
+  --blue-soft: #1c5fb1;
+  --charcoal: #080808;
+  --accent: #2EC4B6;
+  --accent-dark: #279a8c;
+}
+
+/* =========================
+   GLOBAL STYLES
+========================= */
+body {
+  scroll-behavior: smooth;
+  background-color: var(--blue-soft);
+  color: var(--blue-bg);
+  font-smooth: antialiased;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* =========================
+   HEADER & NAVIGATION
+========================= */
+header {
+  box-shadow: 0 1px 5px rgba(0, 0, 0, 0.05);
+}
+
+header a {
+  color: var(--navy);
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+header a:hover {
+  color: var(--accent);
+}
+
+/* =========================
+   HERO SECTION
+========================= */
+section.pt-44 {
+  background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+  padding-top: 11rem;
+  padding-bottom: 8rem;
+  text-align: center;
+  color: var(--navy);
+}
+
+section.pt-44 h1 {
+  font-size: clamp(2.8rem, 6vw, 3.8rem);
+  font-weight: 700;
+  line-height: 1.1;
+}
+
+section.pt-44 p {
+  margin-top: 1.25rem;
+  max-width: 40rem;
+  margin-left: auto;
+  margin-right: auto;
+  font-size: 1.15rem;
+  color: #092d5f;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+a.px-8.py-4 {
+  padding-left: 2.5rem;
+  padding-right: 2.5rem;
+  padding-top: 1.1rem;
+  padding-bottom: 1.1rem;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: all 0.35s ease;
+  cursor: pointer;
+  user-select: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid transparent;
+  box-shadow: 0 6px 12px rgba(46, 196, 182, 0.15);
+}
+
+a.px-8.py-4.bg-navy {
+  background-color: var(--navy);
+  color: #fff;
+  border-color: var(--navy);
+  box-shadow: 0 8px 16px rgba(11, 28, 45, 0.4);
+}
+
+a.px-8.py-4.bg-navy:hover {
+  background-color: var(--navy-dark);
+  border-color: var(--navy-dark);
+  box-shadow: 0 12px 24px rgba(7, 19, 31, 0.7);
+  transform: translateY(-3px);
+}
+
+a.px-8.py-4.border {
+  background-color: transparent;
+  color: var(--navy);
+  border-color: var(--navy);
+  box-shadow: none;
+}
+
+a.px-8.py-4.border:hover {
+  background-color: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+  box-shadow: 0 10px 24px rgba(46, 196, 182, 0.35);
+  transform: translateY(-3px);
+}
+
+/* =========================
+   FEATURE CARDS
+========================= */
+section.py-24 > div {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 2.5rem;
+  max-width: 80rem;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+section.py-24 > div > div {
+  background: #fff;
+  padding: 2.5rem 2rem;
+  border-radius: 1rem;
+  box-shadow: 0 6px 20px rgba(46, 196, 182, 0.1);
+  font-weight: 600;
+  color: var(--navy);
+  font-size: 1.1rem;
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  cursor: default;
+  user-select: none;
+}
+
+section.py-24 > div > div:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 14px 40px rgba(46, 196, 182, 0.25);
+}
+
+/* =========================
+   FOOTER
+========================= */
+footer {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+  font-size: 0.9rem;
+  color: #1c58db;
+  text-align: center;
+  background-color: var(--blue-bg);
+}
+
+/* =========================
+   ANIMATIONS - fade-in effect
+========================= */
+.fade-in {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: all 0.85s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.fade-in.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* =========================
+   RESPONSIVE TWEAKS
+========================= */
+@media (max-width: 768px) {
+  section.pt-44 h1 {
+    font-size: 2.6rem;
+  }
+
+  section.py-24 > div {
+    grid-template-columns: 1fr;
+    padding: 0 1rem;
+  }
+}
