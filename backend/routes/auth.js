@@ -32,7 +32,11 @@ const isLockedOut = (email) => {
   const entry = loginAttempts.get(key);
   if (!entry) return false;
   if (entry.lockedUntil > Date.now()) return true;
-  loginAttempts.delete(key); // lock expired — start fresh
+  // Only clear an EXPIRED lock — never wipe the failed-attempt counter,
+  // otherwise it resets on every login and the lockout can never trigger.
+  if (entry.lockedUntil > 0) {
+    loginAttempts.delete(key);
+  }
   return false;
 };
 
