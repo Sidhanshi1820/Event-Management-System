@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Event Details - EventNov@</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Everything included when you plan this corporate event with EventNov@ — pricing, inclusions and booking." />
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind (built locally - run: npm run build:css) -->
+  <!-- Tailwind CSS -->
+  <!-- Your external CSS -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+
+  <!-- API base URL config (must load before any script that calls the API) -->
+  <script src="config.js"></script>
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    /* Event cards (same card style as events.html) */
+    .event-card {
+      background: white;
+      border-radius: 0.75rem;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .event-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    /* Category chip (same as events.html) */
+    .category-chip {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #0f766e;
+      background-color: rgba(46, 196, 182, 0.15);
+    }
+
+    /* Lighter chip variant for the dark navy hero band */
+    .hero-chip {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #99f6e4;
+      background-color: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+    }
+
+    /* Accent CTA button (same styling as home.html) */
+    .btn-accent {
+      display: inline-block;
+      background-color: #2EC4B6;
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.5rem;
+      font-weight: 600;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 8px rgba(46, 196, 182, 0.2);
+    }
+
+    .btn-accent:hover {
+      background-color: #26a69a;
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(46, 196, 182, 0.3);
+    }
+
+    /* Inclusion check-list (same ✓ styling as home.html feature lists) */
+    .feature-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.4rem;
+    }
+
+    .feature-list li::before {
+      content: "✓";
+      color: #2EC4B6;
+      font-weight: 700;
+    }
+
+    /* Hamburger menu */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+    }
+
+    .hamburger span {
+      width: 25px;
+      height: 3px;
+      background-color: #0B1C2D;
+      margin: 3px 0;
+      transition: 0.3s;
+    }
+
+    .hamburger.active span:nth-child(1) {
+      transform: rotate(-45deg) translate(-5px, 6px);
+    }
+
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.active span:nth-child(3) {
+      transform: rotate(45deg) translate(-5px, -6px);
+    }
+
+    .nav-menu {
+      display: flex;
+    }
+
+    .nav-menu.mobile {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background-color: white;
+      flex-direction: column;
+      padding: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-menu.mobile.active {
+      display: flex;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hamburger {
+        display: flex;
+      }
+      .nav-menu {
+        display: none;
+      }
+    }
+  </style>
+  <link rel="stylesheet" href="assets/tailwind.css" />
+</head>
+
+<body class="font-sans text-charcoal bg-greybg">
+
+<header class="fixed w-full bg-white/90 backdrop-blur border-b z-50">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    <a href="home.html" class="text-xl font-semibold text-navy">EventNov@</a>
+    <nav class="space-x-6 hidden md:flex text-sm">
+      <a href="home.html" class="hover:text-accent transition">Home</a>
+      <a href="services.html" class="hover:text-accent transition">Services</a>
+      <a href="events.html" class="text-accent font-semibold transition">Event Types</a>
+      <a href="about.html" class="hover:text-accent transition">About</a>
+      <a href="contact.html" class="hover:text-accent transition">Contact</a>
+      <a href="dashboard.html" class="hover:text-accent transition">Dashboard</a>
+    </nav>
+    <!-- Mobile hamburger menu -->
+    <div class="hamburger md:hidden" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <nav class="nav-menu mobile" id="nav-menu">
+      <a href="home.html" class="py-2 hover:text-accent transition">Home</a>
+      <a href="services.html" class="py-2 hover:text-accent transition">Services</a>
+      <a href="events.html" class="py-2 text-accent font-semibold transition">Event Types</a>
+      <a href="about.html" class="py-2 hover:text-accent transition">About</a>
+      <a href="contact.html" class="py-2 hover:text-accent transition">Contact</a>
+      <a href="dashboard.html" class="py-2 hover:text-accent transition">Dashboard</a>
+    </nav>
+  </div>
+</header>
+
+<main class="pt-40 pb-20 bg-greybg">
+  <div class="max-w-6xl mx-auto px-6">
+
+    <!-- Loading state -->
+    <div id="event-loading" class="py-24 text-center">
+      <p class="text-gray-500 text-lg">Loading event details…</p>
+    </div>
+
+    <!-- Error state (shown when the API cannot be reached) -->
+    <div id="event-error" class="hidden py-24">
+      <div class="event-card max-w-xl mx-auto p-8 text-center border-l-4 border-red-400" style="transform: none;">
+        <p class="text-4xl mb-4">⚠️</p>
+        <h1 class="text-2xl font-bold text-navy mb-2">Something went wrong</h1>
+        <p class="text-gray-600 mb-6">
+          We couldn't load this event's details. Please check your connection and try again.
+        </p>
+        <a href="events.html" class="text-accent font-semibold hover:underline">← Back to all events</a>
+      </div>
+    </div>
+
+    <!-- Event detail content (rendered from the API) -->
+    <div id="event-content" class="hidden">
+
+      <!-- Hero band (navy gradient, like the dashboard banner) -->
+      <section id="event-hero"
+               class="bg-gradient-to-r from-navy via-teal-800 to-teal-600 rounded-2xl shadow-lg p-8 md:p-10 mb-12 text-white">
+        <div class="flex flex-col md:flex-row md:items-center gap-6">
+          <div id="event-icon"
+               class="w-24 h-24 shrink-0 rounded-full bg-white/20 border-2 border-white/40 flex items-center justify-center text-5xl">
+            🎉
+          </div>
+          <div class="flex-1 min-w-0">
+            <span id="event-category" class="hero-chip mb-3">category</span>
+            <h1 id="event-title" class="text-3xl md:text-4xl font-bold mb-2">Event title</h1>
+            <div class="flex flex-wrap items-center gap-x-6 gap-y-3">
+              <div class="flex items-center gap-2 text-sm">
+                <span class="text-amber-400 text-base">★★★★★</span>
+                <span class="text-white/85"><span id="event-rating">—</span> (<span id="event-reviews">0</span> reviews)</span>
+              </div>
+              <div class="md:ml-auto md:text-right">
+                <p class="text-xs uppercase tracking-wide text-white/70">Starting from</p>
+                <p class="text-2xl font-bold">₹<span id="event-price">0</span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div class="grid lg:grid-cols-3 gap-10">
+        <!-- About this event -->
+        <section class="lg:col-span-2">
+          <h2 class="text-2xl font-bold text-navy mb-4">About this event</h2>
+          <p id="event-description" class="text-gray-600 leading-relaxed text-lg">
+            Event description
+          </p>
+        </section>
+
+        <!-- What's included -->
+        <section>
+          <div class="event-card p-6" style="transform: none;">
+            <h2 class="text-xl font-bold text-navy mb-4">What's included</h2>
+            <ul class="feature-list space-y-3 text-gray-600">
+              <li>Venue sourcing &amp; logistics</li>
+              <li>End-to-end coordination</li>
+              <li>Vendor management</li>
+              <li>On-site event team</li>
+              <li>Post-event report &amp; analytics</li>
+            </ul>
+          </div>
+        </section>
+      </div>
+
+      <!-- CTAs -->
+      <section class="mt-12 pt-8 border-t border-gray-200 text-center">
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <a id="book-cta" href="contact.html" class="btn-accent">Book this event</a>
+          <a href="events.html" class="text-gray-500 hover:text-gray-700 transition text-sm font-medium">Back to all events</a>
+        </div>
+        <p class="text-sm text-gray-500 mt-6">
+          Need help deciding? <a href="contact.html" class="text-accent font-semibold hover:underline">Talk to our team</a> — we'll recommend the right format for your goals and budget.
+        </p>
+      </section>
+
+    </div>
+  </div>
+</main>
+
+<footer class="py-10 text-center text-sm text-gray-500 border-t bg-white">
+  © <span id="footer-year"></span> EventNov@. All rights reserved. <a href="#" class="hover:text-accent">Privacy Policy</a> | <a href="#" class="hover:text-accent">Terms of Service</a>
+</footer>
+
+<script>
+  // Hamburger menu toggle
+  const hamburger = document.getElementById('hamburger');
+  const navMenu = document.getElementById('nav-menu');
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('active');
+    navMenu.classList.toggle('active');
+  });
+
+  // Footer year
+  const y = document.getElementById('footer-year');
+  if (y) y.textContent = new Date().getFullYear();
+
+  // Escape admin-entered API text before injecting it into the page (XSS guard)
+  const escapeHtml = (value) => String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+  // Show/hide the three page states
+  function showState(state) {
+    document.getElementById('event-loading').classList.toggle('hidden', state !== 'loading');
+    document.getElementById('event-error').classList.toggle('hidden', state !== 'error');
+    document.getElementById('event-content').classList.toggle('hidden', state !== 'content');
+  }
+
+  // Render one event object into the page
+  function renderEvent(ev) {
+    const title = escapeHtml(ev.title);
+    const price = (Number(ev.startingPrice) || 0).toLocaleString('en-IN');
+    const rating = ev.rating ?? '—';
+    const reviews = ev.reviews ?? 0;
+
+    document.title = `${ev.title} - EventNov@`;
+    document.getElementById('event-icon').textContent = ev.icon || '🎉';
+    document.getElementById('event-category').textContent = ev.category || '';
+    document.getElementById('event-title').textContent = ev.title || '';
+    document.getElementById('event-rating').textContent = rating;
+    document.getElementById('event-reviews').textContent = reviews;
+    document.getElementById('event-price').textContent = price;
+    document.getElementById('event-description').textContent = ev.description || '';
+
+    // Book CTA carries the event title to the contact form (?event= prefill)
+    const bookCta = document.getElementById('book-cta');
+    bookCta.href = `contact.html?event=${escapeHtml(encodeURIComponent(ev.title || ''))}`;
+    bookCta.setAttribute('aria-label', `Book ${title}`);
+
+    showState('content');
+  }
+
+  // Load the events list, find the one matching ?slug=, and render it.
+  async function loadEvent() {
+    const slug = (new URLSearchParams(window.location.search).get('slug') || '').trim();
+
+    // No slug (or unknown slug) → back to the event types listing
+    if (!slug) {
+      location.replace('events.html');
+      return;
+    }
+
+    try {
+      const response = await fetch(`${window.API_BASE_URL}/events`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+      const data = await response.json();
+      const events = data && Array.isArray(data.events) ? data.events : [];
+
+      const event = events.find(ev => ev && ev.slug === slug);
+      if (!event) {
+        location.replace('events.html');
+        return;
+      }
+
+      renderEvent(event);
+    } catch (err) {
+      console.warn('[event] Could not load event details from API.', err);
+      showState('error');
+    }
+  }
+
+  loadEvent();
+</script>
+
+</body>
+</html>

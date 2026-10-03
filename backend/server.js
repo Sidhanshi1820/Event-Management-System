@@ -174,6 +174,7 @@ app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/proposals', require('./routes/proposals'));
 app.use('/api/events', require('./routes/events'));
+app.use('/api/newsletter', require('./routes/newsletter'));
 
 // Root route
 app.get('/', (req, res) => {

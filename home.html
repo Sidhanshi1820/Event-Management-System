@@ -6,6 +6,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="EventNov@ plans and manages every type of corporate event — conferences, seminars, product launches, galas and more. Get a quote today." />
   <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+
+  <!-- API base URL (loads first, before any page scripts that call the backend) -->
+  <script src="config.js"></script>
   
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -230,6 +233,74 @@
       }
       .slide img { height: 250px; }
     }
+
+    /* Client logos strip */
+    .client-logos-label {
+      text-transform: uppercase;
+      letter-spacing: 0.3em;
+      color: #6b7280; /* gray-500 */
+    }
+    .client-logos-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem 2.75rem;
+    }
+    .client-logo {
+      text-transform: uppercase;
+      color: #9ca3af; /* gray-400 */
+      transition: color 0.3s ease;
+      white-space: nowrap;
+      cursor: default;
+    }
+    .client-logo:hover {
+      color: #4b5563; /* gray-600 */
+    }
+    .client-logo.logo-technova { font-weight: 800; letter-spacing: 0.25em; }
+    .client-logo.logo-finedge  { font-weight: 700; font-style: italic; letter-spacing: 0.18em; }
+    .client-logo.logo-zenith   { font-weight: 500; letter-spacing: 0.4em; }
+    .client-logo.logo-acme     { font-weight: 900; letter-spacing: 0.12em; }
+    .client-logo.logo-vertex   { font-weight: 600; letter-spacing: 0.3em; }
+
+    /* Newsletter (footer top) */
+    .newsletter-block {
+      padding-bottom: 2rem;
+      margin-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .newsletter-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1.5rem;
+    }
+    .newsletter-form {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .newsletter-input {
+      width: 16rem;
+      max-width: 100%;
+      min-width: 0;
+      padding: 0.65rem 0.9rem;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 0.5rem;
+      background: rgba(255, 255, 255, 0.08);
+      color: white;
+      font-size: 0.875rem;
+    }
+    .newsletter-input::placeholder { color: rgba(255, 255, 255, 0.5); }
+    .newsletter-input:focus { outline: none; border-color: #2EC4B6; }
+    .newsletter-form .form-message { flex-basis: 100%; }
+    .btn-primary:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
   </style>
   <link rel="stylesheet" href="assets/tailwind.css" />
 </head>
@@ -308,7 +379,19 @@
   </div>
 </section>
 
-
+<!-- Client Logos Strip -->
+<section class="py-10 bg-gray-100">
+  <div class="max-w-6xl mx-auto px-4 text-center">
+    <p class="client-logos-label text-xs text-gray-500 uppercase tracking-widest mb-6">TRUSTED BY TEAMS AT</p>
+    <div class="client-logos-row flex flex-wrap items-center justify-center gap-x-10 gap-y-4">
+      <span class="client-logo logo-technova font-bold tracking-widest text-gray-400 hover:text-gray-600">TechNova</span>
+      <span class="client-logo logo-finedge font-bold tracking-widest text-gray-400 hover:text-gray-600">FinEdge</span>
+      <span class="client-logo logo-zenith font-bold tracking-widest text-gray-400 hover:text-gray-600">Zenith Group</span>
+      <span class="client-logo logo-acme font-bold tracking-widest text-gray-400 hover:text-gray-600">Acme Corp</span>
+      <span class="client-logo logo-vertex font-bold tracking-widest text-gray-400 hover:text-gray-600">Vertex Labs</span>
+    </div>
+  </div>
+</section>
 
 <!-- About Section -->
 <section id="about" class="py-16 bg-white">
@@ -580,6 +663,29 @@
 
 <!-- Footer -->
 <footer class="bg-navy text-white py-8">
+  <!-- Newsletter (footer top) -->
+  <div class="newsletter-block max-w-6xl mx-auto px-4">
+    <div class="newsletter-row">
+      <div>
+        <h3 class="text-lg font-bold">Stay in the loop</h3>
+        <p class="text-sm text-white/80 mt-1">Corporate event tips and offers. No spam.</p>
+      </div>
+      <form id="newsletter-form" class="newsletter-form" novalidate>
+        <input
+          id="newsletter-email"
+          name="email"
+          type="email"
+          maxlength="254"
+          required
+          autocomplete="email"
+          placeholder="you@company.com"
+          class="newsletter-input"
+        />
+        <button type="submit" id="newsletter-submit" class="btn-primary">Subscribe</button>
+        <div id="newsletter-message" class="form-message text-sm hidden" role="status" aria-live="polite"></div>
+      </form>
+    </div>
+  </div>
   <div class="max-w-6xl mx-auto px-4 text-center">
     <p>&copy; <span id="footer-year"></span> Corporate Event Solutions. All rights reserved.</p>
   </div>
@@ -621,6 +727,78 @@
   const y = document.getElementById('footer-year');
   if (y) y.textContent = new Date().getFullYear();
 </script>
+
+<script>
+  // Newsletter subscription (footer form)
+  (function () {
+    const form = document.getElementById('newsletter-form');
+    if (!form) return;
+
+    const emailInput = document.getElementById('newsletter-email');
+    const submitBtn = document.getElementById('newsletter-submit');
+    const messageDiv = document.getElementById('newsletter-message');
+
+    // classList-safe: add/remove classes, never overwrite className,
+    // so the form-message hook class is preserved.
+    function showNewsletterMessage(text, type) {
+      if (!messageDiv) return;
+      messageDiv.textContent = text;
+      messageDiv.classList.remove('hidden', 'text-green-600', 'text-red-600', 'font-semibold');
+      messageDiv.classList.add(type === 'success' ? 'text-green-600' : 'text-red-600', 'font-semibold');
+    }
+
+    // Same pragmatic shape the backend validates with
+    const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+    form.addEventListener('submit', async function (event) {
+      event.preventDefault();
+
+      const email = (emailInput && emailInput.value ? emailInput.value : '').trim();
+
+      if (!EMAIL_REGEX.test(email)) {
+        showNewsletterMessage('Please enter a valid email address.', 'error');
+        if (emailInput) emailInput.focus();
+        return;
+      }
+
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = 'Subscribing...';
+      }
+
+      try {
+        const response = await fetch((window.API_BASE_URL || 'http://localhost:3000/api') + '/newsletter', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: email })
+        });
+
+        let data = {};
+        try { data = await response.json(); } catch (_) { /* empty or non-JSON body */ }
+
+        if (response.status === 201) {
+          showNewsletterMessage(data.message || 'Subscribed! Watch your inbox for event tips and offers.', 'success');
+          form.reset();
+        } else if (response.status === 400) {
+          showNewsletterMessage(data.message || 'This email is already subscribed', 'error');
+        } else {
+          showNewsletterMessage(data.message || 'Subscription failed. Please try again later.', 'error');
+        }
+      } catch (error) {
+        console.error('Newsletter error:', error);
+        showNewsletterMessage('Connection error. Please check your internet connection and try again.', 'error');
+      } finally {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = 'Subscribe';
+        }
+      }
+    });
+  })();
+</script>
+
+<!-- Widgets (WhatsApp float button, etc.) -->
+<script src="widgets.js"></script>
 
 </body>
 </html>

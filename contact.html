@@ -41,6 +41,145 @@
       transform: translateY(-2px);
     }
 
+    /* Wizard progress bar: completed = accent fill, current = accent border/text, upcoming = gray */
+    .progress-segment {
+      height: 6px;
+      border-radius: 9999px;
+      background-color: #e5e7eb;
+      border: 2px solid transparent;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .progress-segment.completed {
+      background-color: #2EC4B6;
+      border-color: #2EC4B6;
+    }
+
+    .progress-segment.current {
+      background-color: #ffffff;
+      border-color: #2EC4B6;
+    }
+
+    .progress-label {
+      margin-top: 0.5rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: #9ca3af;
+      transition: color 0.3s ease;
+    }
+
+    .progress-label.completed,
+    .progress-label.current {
+      color: #2EC4B6;
+    }
+
+    .progress-label.current {
+      font-weight: 600;
+    }
+
+    /* Wizard step panels: fade in each time a panel is shown */
+    .step-panel {
+      animation: stepFadeIn 0.3s ease;
+    }
+
+    @keyframes stepFadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Wizard footer buttons */
+    .wizard-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .wizard-actions.end {
+      justify-content: flex-end;
+    }
+
+    .wizard-actions.between {
+      justify-content: space-between;
+    }
+
+    .btn-accent {
+      background-color: #2EC4B6;
+      color: #ffffff;
+    }
+
+    .btn-accent:hover {
+      background-color: #29b0a4;
+    }
+
+    .btn-back {
+      background-color: #e5e7eb;
+      color: #374151;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-back:hover {
+      background-color: #d1d5db;
+    }
+
+    /* Live price estimator box (accent-tinted) */
+    .estimate-box {
+      border: 1px solid rgba(46, 196, 182, 0.4);
+      background-color: rgba(46, 196, 182, 0.08);
+      border-radius: 0.5rem;
+      padding: 0.875rem 1rem;
+    }
+
+    .estimate-amount {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #0B1C2D;
+    }
+
+    .estimate-note {
+      font-size: 0.75rem;
+      color: #6b7280;
+      margin-top: 0.25rem;
+    }
+
+    /* Review summary box (step 3) */
+    .review-summary {
+      margin: 0;
+      border: 1px solid #e5e7eb;
+      border-radius: 0.5rem;
+      padding: 1rem;
+      display: grid;
+      gap: 0.5rem;
+      background-color: #f9fafb;
+    }
+
+    .review-row {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      gap: 0.75rem;
+      font-size: 0.875rem;
+    }
+
+    .review-row dt,
+    .review-row dd {
+      margin: 0;
+    }
+
+    .review-row dt {
+      color: #6b7280;
+    }
+
+    .review-row dd {
+      color: #0B1C2D;
+      font-weight: 500;
+      overflow-wrap: anywhere;
+    }
+
+    @media (max-width: 480px) {
+      .review-row {
+        grid-template-columns: 1fr;
+        gap: 0.15rem;
+      }
+    }
+
     /* Hamburger menu */
     .hamburger {
       display: none;
@@ -145,48 +284,106 @@
     <!-- Contact Form -->
     <div>
       <h2 class="text-2xl font-semibold text-navy mb-6">Request a Proposal</h2>
-      <form id="contact-form" class="space-y-6">
-        <div>
-          <label for="full_name" class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-          <input type="text" id="full_name" name="full_name" maxlength="60" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Your Full Name" required>
-        </div>
-        <div>
-          <label for="company" class="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
-          <input type="text" id="company" name="company" maxlength="120" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Company Name" required>
-        </div>
-        <div>
-          <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
-          <input type="email" id="email" name="email" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Email" required>
-        </div>
-        <div>
-          <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
-          <input type="tel" id="phone" name="phone" maxlength="20" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Phone Number">
-        </div>
-        <div>
-          <label for="event_type" class="block text-sm font-medium text-gray-700 mb-2">Event Type</label>
-          <select id="event_type" name="event_type" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" required>
-            <option value="" disabled selected>Select Event Type</option>
-            <option value="Seminar">Seminar</option>
-            <option value="Conference">Conference</option>
-            <option value="Product Launch">Product Launch</option>
-            <option value="Hybrid">Hybrid</option>
-          </select>
-        </div>
-        <div class="grid md:grid-cols-2 gap-4">
-          <div>
-            <label for="event_date" class="block text-sm font-medium text-gray-700 mb-2">Event Date</label>
-            <input type="date" id="event_date" name="event_date" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none">
+      <!-- Wizard progress bar -->
+      <div id="wizard-progress" class="mb-10" role="group" aria-label="Proposal request progress">
+        <div class="flex gap-2">
+          <div class="flex-1">
+            <div class="progress-segment current" data-segment="1"></div>
+            <p class="progress-label current" data-segment="1">Event</p>
           </div>
-          <div>
-            <label for="event_time" class="block text-sm font-medium text-gray-700 mb-2">Event Time</label>
-            <input type="time" id="event_time" name="event_time" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none">
+          <div class="flex-1">
+            <div class="progress-segment" data-segment="2"></div>
+            <p class="progress-label" data-segment="2">Your Details</p>
+          </div>
+          <div class="flex-1">
+            <div class="progress-segment" data-segment="3"></div>
+            <p class="progress-label" data-segment="3">Confirm</p>
           </div>
         </div>
-        <div>
-          <label for="message" class="block text-sm font-medium text-gray-700 mb-2">Event Details</label>
-          <textarea id="message" name="message" rows="5" maxlength="1000" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Provide details about your event..."></textarea>
+      </div>
+
+      <form id="contact-form" novalidate>
+        <!-- Step 1: Event -->
+        <div class="step-panel space-y-6" data-step="1">
+          <div>
+            <label for="event_type" class="block text-sm font-medium text-gray-700 mb-2">Event Type</label>
+            <select id="event_type" name="event_type" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" required>
+              <option value="" disabled selected>Select Event Type</option>
+              <!-- Static fallback options; replaced by live /events data when the API is reachable -->
+              <option value="Seminar">Seminar</option>
+              <option value="Conference">Conference</option>
+              <option value="Product Launch">Product Launch</option>
+              <option value="Hybrid">Hybrid</option>
+            </select>
+          </div>
+          <div class="grid md:grid-cols-2 gap-4">
+            <div>
+              <label for="event_date" class="block text-sm font-medium text-gray-700 mb-2">Event Date</label>
+              <input type="date" id="event_date" name="event_date" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none">
+            </div>
+            <div>
+              <label for="event_time" class="block text-sm font-medium text-gray-700 mb-2">Event Time</label>
+              <input type="time" id="event_time" name="event_time" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none">
+            </div>
+          </div>
+          <div>
+            <label for="guests" class="block text-sm font-medium text-gray-700 mb-2">Number of Guests</label>
+            <input type="number" id="guests" name="guests" min="1" step="1" inputmode="numeric" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="e.g. 150">
+          </div>
+          <!-- Live price estimate (step 1) -->
+          <div id="estimate-step1" class="estimate-box hidden">
+            <p class="estimate-amount"></p>
+            <p class="estimate-note">Indicative only — final quote after our team reviews your request.</p>
+          </div>
+          <div class="wizard-actions end">
+            <button type="button" id="next-step-1" class="btn-submit btn-accent py-3 px-6 rounded-lg font-semibold">Next</button>
+          </div>
         </div>
-        <button type="submit" class="btn-submit w-full bg-navy text-white py-3 px-6 rounded-lg font-semibold hover:bg-opacity-90">Submit Request</button>
+
+        <!-- Step 2: Your Details -->
+        <div class="step-panel space-y-6 hidden" data-step="2">
+          <div>
+            <label for="full_name" class="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
+            <input type="text" id="full_name" name="full_name" maxlength="60" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Your Full Name" required>
+          </div>
+          <div>
+            <label for="company" class="block text-sm font-medium text-gray-700 mb-2">Company Name</label>
+            <input type="text" id="company" name="company" maxlength="120" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Company Name" required>
+          </div>
+          <div>
+            <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Email</label>
+            <input type="email" id="email" name="email" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Email" required>
+          </div>
+          <div>
+            <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
+            <input type="tel" id="phone" name="phone" maxlength="20" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Phone Number">
+          </div>
+          <div class="wizard-actions between">
+            <button type="button" class="btn-back py-3 px-6 rounded-lg font-semibold" data-back>Back</button>
+            <button type="button" id="next-step-2" class="btn-submit btn-accent py-3 px-6 rounded-lg font-semibold">Next</button>
+          </div>
+        </div>
+
+        <!-- Step 3: Confirm -->
+        <div class="step-panel space-y-6 hidden" data-step="3">
+          <div>
+            <label for="message" class="block text-sm font-medium text-gray-700 mb-2">Event Details</label>
+            <textarea id="message" name="message" rows="5" maxlength="1000" class="form-input w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none" placeholder="Provide details about your event..."></textarea>
+          </div>
+          <div>
+            <h3 class="text-sm font-medium text-gray-700 mb-2">Review Your Request</h3>
+            <dl id="review-summary" class="review-summary"></dl>
+          </div>
+          <!-- Live price estimate (step 3 summary) -->
+          <div id="estimate-step3" class="estimate-box hidden">
+            <p class="estimate-amount"></p>
+            <p class="estimate-note">Indicative only — final quote after our team reviews your request.</p>
+          </div>
+          <div class="wizard-actions between">
+            <button type="button" class="btn-back py-3 px-6 rounded-lg font-semibold" data-back>Back</button>
+            <button type="submit" class="btn-submit btn-accent py-3 px-6 rounded-lg font-semibold">Submit Request</button>
+          </div>
+        </div>
       </form>
       <div id="form-message" class="form-message mt-4 text-center hidden"></div>
     </div>
@@ -239,16 +436,198 @@
     navMenu.classList.toggle('active');
   });
 
-  // Form validation and submission
+  // ---------------------------------------------------------------------------
+  // 3-step proposal wizard with a live price estimator
+  // Step 1 "Event" -> Step 2 "Your Details" -> Step 3 "Confirm" (submit)
   // config.js provides window.API_BASE_URL
+  // ---------------------------------------------------------------------------
   const API_BASE_URL = window.API_BASE_URL;
   const form = document.getElementById('contact-form');
   const messageDiv = document.getElementById('form-message');
   const submitBtn = form.querySelector('button[type="submit"]');
   const defaultBtnText = submitBtn.textContent;
 
+  const TOTAL_STEPS = 3;
+  let currentStep = 1;
+
+  // startingPrice lookup built from the /events response (lower-cased event title -> price).
+  // Falls back to 0 when the API is unreachable and only the static options are in use.
+  let eventPricing = {};
+  // Per-guest catering approximation layered on top of an event's starting price.
+  // Deliberately a rough constant: the final quote is confirmed by our team.
+  const PER_GUEST_RATE = 850;
+
+  const escapeHtml = (value) => String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+  // ---------- Wizard navigation ----------
+  function goToStep(step) {
+    currentStep = Math.min(Math.max(step, 1), TOTAL_STEPS);
+
+    // Only the active step's fields are visible; re-showing a panel replays its fade animation
+    document.querySelectorAll('.step-panel').forEach((panel) => {
+      const isActive = Number(panel.dataset.step) === currentStep;
+      panel.classList.toggle('hidden', !isActive);
+    });
+
+    // Progress bar: completed / current / upcoming states
+    for (let i = 1; i <= TOTAL_STEPS; i++) {
+      document.querySelectorAll(`[data-segment="${i}"]`).forEach((el) => {
+        el.classList.toggle('completed', i < currentStep);
+        el.classList.toggle('current', i === currentStep);
+      });
+    }
+
+    if (currentStep === TOTAL_STEPS) renderReview();
+    updateEstimate();
+  }
+
+  // ---------- Per-step validation + Next buttons ----------
+  function tryAdvanceFromStep(step) {
+    if (step === 1) {
+      const eventType = document.getElementById('event_type').value;
+      if (!eventType) {
+        showMessage('Please select an event type to continue.', 'error');
+        return;
+      }
+      const guestsRaw = document.getElementById('guests').value;
+      if (guestsRaw) {
+        const guests = Number(guestsRaw);
+        if (!Number.isFinite(guests) || guests < 1) {
+          showMessage('Number of guests must be a whole number of at least 1.', 'error');
+          return;
+        }
+      }
+      goToStep(2);
+    } else if (step === 2) {
+      const fullName = document.getElementById('full_name').value.trim();
+      const company = document.getElementById('company').value.trim();
+      const email = document.getElementById('email').value.trim();
+      if (!fullName || !company || !email) {
+        showMessage('Please fill in all required fields.', 'error');
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        showMessage('Please enter a valid email address.', 'error');
+        return;
+      }
+      goToStep(3);
+    }
+  }
+
+  document.getElementById('next-step-1').addEventListener('click', () => tryAdvanceFromStep(1));
+  document.getElementById('next-step-2').addEventListener('click', () => tryAdvanceFromStep(2));
+  document.querySelectorAll('[data-back]').forEach((btn) => {
+    btn.addEventListener('click', () => goToStep(currentStep - 1));
+  });
+
+  // ---------- Review summary (step 3) ----------
+  function renderReview() {
+    const summary = document.getElementById('review-summary');
+    if (!summary) return;
+    const fields = [
+      ['Event Type', document.getElementById('event_type').value],
+      ['Event Date', document.getElementById('event_date').value],
+      ['Event Time', document.getElementById('event_time').value],
+      ['Guests', document.getElementById('guests').value],
+      ['Full Name', document.getElementById('full_name').value.trim()],
+      ['Company', document.getElementById('company').value.trim()],
+      ['Email', document.getElementById('email').value.trim()],
+      ['Phone', document.getElementById('phone').value.trim()],
+      ['Details', document.getElementById('message').value.trim()]
+    ];
+    // Labels are static; every user-entered value goes through escapeHtml
+    summary.innerHTML = fields.map(([label, value]) => `
+      <div class="review-row">
+        <dt>${label}</dt>
+        <dd>${escapeHtml(value) || '&mdash;'}</dd>
+      </div>
+    `).join('');
+  }
+
+  // ---------- Live price estimator ----------
+  function updateEstimate() {
+    const eventType = document.getElementById('event_type').value;
+    const guestsRaw = document.getElementById('guests').value;
+    const guests = Number(guestsRaw);
+    const boxes = document.querySelectorAll('.estimate-box');
+
+    // The estimate only makes sense once an event type and a guest count are set
+    if (!eventType || !guestsRaw || !Number.isFinite(guests) || guests < 1) {
+      boxes.forEach((box) => box.classList.add('hidden'));
+      return;
+    }
+
+    const startingPrice = eventPricing[eventType.trim().toLowerCase()] || 0;
+    const estimate = Number(startingPrice + guests * PER_GUEST_RATE).toLocaleString('en-IN');
+    boxes.forEach((box) => {
+      box.querySelector('.estimate-amount').textContent = `Estimated from ₹${estimate}`;
+      box.classList.remove('hidden');
+    });
+  }
+
+  document.getElementById('event_type').addEventListener('change', updateEstimate);
+  document.getElementById('guests').addEventListener('input', updateEstimate);
+
+  // ---------- Event types from the API + ?event= prefill ----------
+  async function loadEventTypes() {
+    const select = document.getElementById('event_type');
+    const requested = (new URLSearchParams(window.location.search).get('event') || '').trim().toLowerCase();
+
+    // Pre-select the option whose value matches ?event= (case-insensitive)
+    const applyEventPrefill = () => {
+      if (!requested) return;
+      const match = Array.from(select.options).find(
+        (option) => option.value && option.value.trim().toLowerCase() === requested
+      );
+      if (match) select.value = match.value;
+    };
+
+    try {
+      const response = await fetch(API_BASE_URL + '/events');
+      if (!response.ok) throw new Error('HTTP ' + response.status);
+      const data = await response.json();
+      const events = data && Array.isArray(data.events) ? data.events : [];
+      if (!data || !data.success || events.length === 0) throw new Error('No event types returned');
+
+      // Preserve any pre-selected value across the rebuild
+      const previousValue = select.value;
+      eventPricing = {};
+      select.innerHTML = '<option value="" disabled selected>Select Event Type</option>';
+      events.forEach((ev) => {
+        if (!ev || !ev.title) return;
+        const option = document.createElement('option');
+        option.value = ev.title;
+        option.textContent = ev.title;
+        select.appendChild(option);
+        eventPricing[ev.title.trim().toLowerCase()] = Number(ev.startingPrice) || 0;
+      });
+      if (previousValue && Array.from(select.options).some((option) => option.value === previousValue)) {
+        select.value = previousValue;
+      }
+      // ?event= prefill against the API-provided options
+      applyEventPrefill();
+    } catch (err) {
+      // API unreachable: keep the static fallback options and prefill against those too
+      console.warn('[contact] Could not load event types from API — using static fallback options.', err);
+      applyEventPrefill();
+    }
+    updateEstimate();
+  }
+
+  // ---------- Submission ----------
   form.addEventListener('submit', async function(e) {
     e.preventDefault();
+
+    // Enter key on steps 1-2 behaves like that step's Next button
+    if (currentStep < TOTAL_STEPS) {
+      tryAdvanceFromStep(currentStep);
+      return;
+    }
 
     // Read only the fields that actually exist in this form
     const fullName = document.getElementById('full_name').value.trim();
@@ -258,6 +637,7 @@
     const eventType = document.getElementById('event_type').value;
     const eventDate = document.getElementById('event_date').value;
     const eventTime = document.getElementById('event_time').value;
+    const guestsRaw = document.getElementById('guests').value;
     const message = document.getElementById('message').value.trim();
 
     if (!fullName || !company || !email || !eventType) {
@@ -274,6 +654,10 @@
     };
     if (phone) payload.phone = phone;
     if (message) payload.message = message;
+    if (guestsRaw) {
+      const guests = Number(guestsRaw);
+      if (Number.isFinite(guests) && guests >= 1) payload.guests = guests;
+    }
     // Date and time are combined into one timestamp the API stores as event_date
     if (eventDate) payload.event_date = eventTime ? `${eventDate}T${eventTime}` : eventDate;
 
@@ -298,6 +682,7 @@
       if (data && data.success) {
         showMessage(data.message || 'Proposal received. Our team will contact you within 24 hours.', 'success');
         form.reset();
+        goToStep(1); // reset the wizard back to the first step
       } else {
         const serverMessage = (data && data.message)
           ? data.message
@@ -321,6 +706,10 @@
       messageDiv.classList.add('hidden');
     }, 5000);
   }
+
+  // Init: show step 1, then load live event types (and apply ?event= prefill)
+  goToStep(1);
+  loadEventTypes();
 </script>
 
 </body>

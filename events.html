@@ -75,6 +75,88 @@
       transform: translateY(-1px);
     }
 
+    /* Card action row: "View details" + "Book this event" side by side */
+    .card-actions {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+    }
+
+    .card-actions a {
+      flex: 1;
+    }
+
+    .card-cta-secondary {
+      display: block;
+      text-align: center;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #0f766e;
+      background-color: rgba(46, 196, 182, 0.12);
+      border: 1px solid rgba(46, 196, 182, 0.35);
+      padding: 0.65rem 1rem;
+      border-radius: 0.5rem;
+      transition: all 0.3s ease;
+    }
+
+    .card-cta-secondary:hover {
+      background-color: rgba(46, 196, 182, 0.22);
+      transform: translateY(-1px);
+    }
+
+    /* Category filter chips */
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.45rem 1rem;
+      border-radius: 9999px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      background-color: white;
+      color: #4b5563;
+      border: 1px solid #d1d5db;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .filter-chip:hover {
+      border-color: #2EC4B6;
+      color: #0f766e;
+    }
+
+    .filter-chip.active {
+      background-color: #2EC4B6;
+      border-color: #2EC4B6;
+      color: white;
+    }
+
+    /* Filter bar (chips + sort dropdown) */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    /* Sort select styled like the search input */
+    .sort-select {
+      padding: 0.625rem 2.25rem 0.625rem 1.25rem;
+      border: 1px solid #d1d5db;
+      border-radius: 9999px;
+      background-color: white;
+      font-size: 0.875rem;
+      color: #374151;
+      cursor: pointer;
+    }
+
     /* Search input */
     .search-input {
       transition: border-color 0.3s ease, box-shadow 0.3s ease;
@@ -212,6 +294,16 @@
 <!-- Event types grid -->
 <section class="pb-20 bg-greybg">
   <div class="max-w-6xl mx-auto px-6">
+    <!-- Category filter chips + sort -->
+    <div class="filter-bar">
+      <div id="category-chips" class="chip-row" role="group" aria-label="Filter event types by category"></div>
+      <select id="event-sort" class="search-input sort-select" aria-label="Sort event types">
+        <option value="recommended">Recommended</option>
+        <option value="price-asc">Price: Low to High</option>
+        <option value="price-desc">Price: High to Low</option>
+        <option value="rating-desc">Rating: High to Low</option>
+      </select>
+    </div>
     <div id="event-grid" class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
 
       <div class="event-card p-6 flex flex-col" data-name="conferences corporate summit keynote">
@@ -447,27 +539,136 @@
     navMenu.classList.toggle('active');
   });
 
-  // Live search filter for event cards
+  // Escape user/admin-entered text before injecting it into the grid (XSS guard)
+  const escapeHtml = (value) => String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+  // Kebab-case slug for detail links, e.g. "Galas & Award Nights" -> "galas-award-nights"
+  const slugify = (value) => String(value ?? '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
   const searchInput = document.getElementById('event-search');
   const noResults = document.getElementById('no-results');
+  const grid = document.getElementById('event-grid');
+  const chipRow = document.getElementById('category-chips');
+  const sortSelect = document.getElementById('event-sort');
 
-  searchInput.addEventListener('input', () => {
+  let allEvents = [];
+  let activeCategory = 'all';
+
+  const parsePrice = (text) => {
+    const digits = String(text ?? '').replace(/[^\d]/g, '');
+    return digits ? parseInt(digits, 10) : 0;
+  };
+
+  // Derive event data from the static fallback cards so the chips, filters and
+  // sorting also work when the API is unreachable.
+  function eventsFromStaticCards() {
+    return Array.from(grid.querySelectorAll('.event-card')).map((card, index) => {
+      const title = (card.querySelector('h3')?.textContent || 'Event').trim();
+      const category = (card.querySelector('.category-chip')?.textContent || '').trim();
+      const metaText = card.querySelector('.text-gray-500')?.textContent || '';
+      const ratingMatch = metaText.match(/([\d.]+)/);
+      const reviewsMatch = metaText.match(/\((\d+)/);
+      return {
+        title,
+        category,
+        description: (card.querySelector('p.flex-grow')?.textContent || '').trim(),
+        icon: (card.querySelector('.event-icon')?.textContent || '🎉').trim(),
+        price: parsePrice(card.querySelector('.text-right p:last-child')?.textContent),
+        rating: ratingMatch ? parseFloat(ratingMatch[1]) : 0,
+        reviews: reviewsMatch ? parseInt(reviewsMatch[1], 10) : 0,
+        slug: slugify(title),
+        dataName: `${card.dataset.name || title} ${category}`.trim(),
+        sortOrder: index
+      };
+    });
+  }
+
+  // Shared card template — used for API events and static fallback cards alike.
+  function cardHtml(ev) {
+    const slug = escapeHtml(ev.slug || slugify(ev.title));
+    const ratingDisplay = escapeHtml(ev.rating ?? '—');
+    const ratingNum = Number(ev.rating) || 0;
+    const price = (Number(ev.price) || 0).toLocaleString('en-IN');
+    return `
+      <div class="event-card p-6 flex flex-col" data-name="${escapeHtml(ev.dataName)}" data-slug="${slug}" data-price="${Number(ev.price) || 0}" data-rating="${ratingNum}">
+        <div class="event-icon mb-4">${escapeHtml(ev.icon || '🎉')}</div>
+        <h3 class="text-xl font-semibold text-navy mb-2">${escapeHtml(ev.title)}</h3>
+        <p class="text-gray-600 mb-4 flex-grow">${escapeHtml(ev.description)}</p>
+        <div class="flex items-center gap-2 mb-3 text-sm">
+          <span class="text-amber-500">★★★★★</span>
+          <span class="text-gray-500">${ratingDisplay} (${escapeHtml(ev.reviews ?? 0)} reviews)</span>
+        </div>
+        <div class="flex items-center justify-between border-t pt-3">
+          <span class="category-chip">${escapeHtml(ev.category)}</span>
+          <div class="text-right">
+            <p class="text-xs text-gray-500">Starting from</p>
+            <p class="text-sm font-semibold text-navy">₹${price}</p>
+          </div>
+        </div>
+        <div class="card-actions">
+          <a href="event.html?slug=${slug}" class="card-cta-secondary">View details →</a>
+          <a href="contact.html" class="card-cta">Book this event →</a>
+        </div>
+      </div>
+    `;
+  }
+
+  // Single render path for the grid: applies the active category chip, the
+  // search query (data-name match) and the chosen sort, then re-renders.
+  function renderGrid(events) {
     const query = searchInput.value.trim().toLowerCase();
-    let visibleCount = 0;
+    const sort = sortSelect.value;
 
-    // Query the grid fresh on every input so the filter also covers cards
-    // re-rendered from the API (see loadEventsFromApi below).
-    const cards = document.querySelectorAll('#event-grid .event-card');
+    const list = events.filter(ev =>
+      (activeCategory === 'all' || ev.category === activeCategory) &&
+      (!query || String(ev.dataName || '').toLowerCase().includes(query))
+    );
 
-    cards.forEach(card => {
-      const haystack = (card.dataset.name + ' ' + card.textContent).toLowerCase();
-      const matches = !query || haystack.includes(query);
-      card.classList.toggle('hidden', !matches);
-      if (matches) visibleCount++;
+    list.sort((a, b) => {
+      switch (sort) {
+        case 'price-asc': return (a.price || 0) - (b.price || 0);
+        case 'price-desc': return (b.price || 0) - (a.price || 0);
+        case 'rating-desc': return (Number(b.rating) || 0) - (Number(a.rating) || 0);
+        default: return (a.sortOrder ?? 0) - (b.sortOrder ?? 0); // Recommended
+      }
     });
 
-    noResults.classList.toggle('hidden', visibleCount > 0);
+    grid.innerHTML = list.map(cardHtml).join('');
+    noResults.classList.toggle('hidden', list.length > 0);
+  }
+
+  // Build the chip row: "All" + one chip per unique category in the events.
+  function buildChips(events) {
+    const categories = ['All', ...new Set(events.map(ev => ev.category).filter(Boolean))];
+    chipRow.innerHTML = categories.map(cat => {
+      const value = cat === 'All' ? 'all' : cat;
+      return `<button type="button" class="filter-chip${value === activeCategory ? ' active' : ''}" data-category="${escapeHtml(value)}">${escapeHtml(cat)}</button>`;
+    }).join('');
+  }
+
+  chipRow.addEventListener('click', (event) => {
+    const chip = event.target.closest('.filter-chip');
+    if (!chip) return;
+    activeCategory = chip.dataset.category || 'all';
+    chipRow.querySelectorAll('.filter-chip').forEach(c => {
+      c.classList.toggle('active', c.dataset.category === activeCategory);
+    });
+    renderGrid(allEvents);
   });
+
+  sortSelect.addEventListener('change', () => renderGrid(allEvents));
+
+  // Live search: re-render the grid fresh on every input so the query also
+  // covers cards re-rendered from the API (see loadEventsFromApi below).
+  searchInput.addEventListener('input', () => renderGrid(allEvents));
 
   // Personalized welcome after login / register
   if (localStorage.getItem('authToken')) {
@@ -501,64 +702,59 @@
   const y = document.getElementById('footer-year');
   if (y) y.textContent = new Date().getFullYear();
 
-  // Escape user/admin-entered text before injecting it into the grid (XSS guard)
-  const escapeHtml = (value) => String(value ?? '')
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;')
-    .replace(/'/g, '&#39;');
-
   // Load event types from the API and replace the static fallback cards.
-  // On any failure (or empty list) the static cards stay untouched.
+  // On any failure (or empty list) the static-derived cards stay untouched.
   async function loadEventsFromApi() {
     try {
       const response = await fetch(`${window.API_BASE_URL}/events`);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
-      const events = data && Array.isArray(data.events) ? data.events : [];
+      const apiEvents = data && Array.isArray(data.events) ? data.events : [];
 
-      if (!data || !data.success || events.length === 0) {
+      if (!data || !data.success || apiEvents.length === 0) {
         console.warn('[events] API returned no event types — keeping static fallback cards.');
         return;
       }
 
-      const grid = document.getElementById('event-grid');
-      grid.innerHTML = events.map(ev => {
-        const price = (Number(ev.startingPrice) || 0).toLocaleString('en-IN');
-        const rating = ev.rating ?? '—';
-        const reviews = ev.reviews ?? 0;
-        const dataName = escapeHtml(`${ev.title} ${ev.category} ${ev.description}`);
-        return `
-          <div class="event-card p-6 flex flex-col" data-name="${dataName}">
-            <div class="event-icon mb-4">${escapeHtml(ev.icon || '🎉')}</div>
-            <h3 class="text-xl font-semibold text-navy mb-2">${escapeHtml(ev.title)}</h3>
-            <p class="text-gray-600 mb-4 flex-grow">${escapeHtml(ev.description)}</p>
-            <div class="flex items-center gap-2 mb-3 text-sm">
-              <span class="text-amber-500">★★★★★</span>
-              <span class="text-gray-500">${escapeHtml(rating)} (${escapeHtml(reviews)} reviews)</span>
-            </div>
-            <div class="flex items-center justify-between border-t pt-3">
-              <span class="category-chip">${escapeHtml(ev.category)}</span>
-              <div class="text-right">
-                <p class="text-xs text-gray-500">Starting from</p>
-                <p class="text-sm font-semibold text-navy">₹${price}</p>
-              </div>
-            </div>
-            <a href="contact.html" class="card-cta mt-4">Book this event →</a>
-          </div>
-        `;
-      }).join('');
+      allEvents = apiEvents.map((ev, index) => {
+        const title = ev.title ?? 'Event';
+        const parsedSort = Number(ev.sortOrder);
+        return {
+          title,
+          category: ev.category ?? '',
+          description: ev.description ?? '',
+          icon: ev.icon || '🎉',
+          price: Number(ev.startingPrice) || 0,
+          rating: ev.rating,
+          reviews: ev.reviews ?? 0,
+          slug: ev.slug || slugify(title),
+          dataName: `${title} ${ev.category ?? ''} ${ev.description ?? ''}`,
+          sortOrder: Number.isFinite(parsedSort) ? parsedSort : index
+        };
+      });
+
+      // Reset the chip filter if the active category no longer exists.
+      const categories = new Set(allEvents.map(ev => ev.category).filter(Boolean));
+      if (activeCategory !== 'all' && !categories.has(activeCategory)) activeCategory = 'all';
+
+      buildChips(allEvents);
+      renderGrid(allEvents);
     } catch (err) {
       console.warn('[events] Could not load event types from API — keeping static fallback cards.', err);
     }
   }
 
+  // Boot: start from the static fallback cards (so chips, filters and sorting
+  // work even offline), then swap in API data when it loads.
+  allEvents = eventsFromStaticCards();
+  buildChips(allEvents);
+  renderGrid(allEvents);
   loadEventsFromApi();
 </script>
 
 <!-- Authentication Script -->
 <script src="./auth.js"></script>
 
+<script src="widgets.js" defer></script>
 </body>
 </html>
