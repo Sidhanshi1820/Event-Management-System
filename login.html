@@ -8,31 +8,11 @@
   
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-  
+
+  <!-- Tailwind (built locally - run: npm run build:css) -->
   <!-- Tailwind CSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  
   <!-- Your external CSS -->
   <link rel="stylesheet" href="style.css" />
-  
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            navy: "#0B1C2D",
-            greybg: "#F3F5F7",
-            charcoal: "#2B2E34",
-            accent: "#2EC4B6"
-          },
-          fontFamily: {
-            sans: ["Inter", "system-ui", "sans-serif"]
-          }
-        }
-      }
-    }
-  </script>
-
   <style>
     html {
       scroll-behavior: smooth;
@@ -174,6 +154,7 @@
       }
     }
   </style>
+  <link rel="stylesheet" href="assets/tailwind.css" />
 </head>
 
 <body class="font-sans text-charcoal bg-greybg">
