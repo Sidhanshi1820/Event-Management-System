@@ -13,8 +13,18 @@
         .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
         .section { margin-bottom: 40px; }
         .testimonials { position: relative; overflow: hidden; }
-        .testimonial { display: none; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
-        .testimonial.active { display: block; }
+        .testimonial { display: none; padding: 32px; background: white; border-radius: 12px; border-left: 4px solid #2EC4B6; box-shadow: 0 6px 24px rgba(0,0,0,0.08); }
+        .testimonial.active { display: block; animation: fadeInUp 0.4s ease; }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .testimonial-stars { color: #f59e0b; font-size: 20px; letter-spacing: 3px; margin-bottom: 14px; }
+        .testimonial p { font-size: 17px; line-height: 1.7; color: #374151; }
+        .testimonial-author { display: flex; align-items: center; gap: 14px; margin-top: 22px; padding-top: 18px; border-top: 1px solid #eceff1; }
+        .testimonial-avatar { width: 48px; height: 48px; border-radius: 50%; background: rgba(46,196,182,0.15); color: #0f766e; font-weight: 700; display: flex; align-items: center; justify-content: center; font-size: 16px; }
+        .testimonial-name { font-weight: 600; color: #0B1C2D; margin: 0; }
+        .testimonial-role { font-size: 13px; color: #6b7280; margin: 2px 0 0; }
         button { background: #007bff; color: white; border: none; padding: 10px 20px; cursor: pointer; margin: 10px; }
     </style>
 </head>
@@ -45,44 +55,53 @@
             <h2>What Our Clients Say</h2>
             <div class="testimonials" id="testimonials">
                 <div class="testimonial active">
-                    <p>"EventNov@ transformed our annual conference into an engaging success!" - Client A</p>
-                </div>
-                <div class="testimonial">
-                    <p>"Their attention to detail and innovation exceeded our expectations." - Client B</p>
-                </div>
-                <div class="testimonial">
-                    <p>"Reliable, professional, and results-driven. Highly recommend!" - Client C</p>
+                    <div class="testimonial-stars">★★★★★</div>
+                    <p>"EventNov@ transformed our annual conference into an engaging success! From agenda design to on-site execution and the post-event ROI report, their team handled everything with real professionalism."</p>
+                    <div class="testimonial-author">
+                        <div class="testimonial-avatar">AK</div>
+                        <div>
+                            <p class="testimonial-name">Ananya Kapoor</p>
+                            <p class="testimonial-role">Head of Marketing, TechNova</p>
+                        </div>
+                    </div>
                 </div>
             </div>
-            <button onclick="prevTestimonial()">Previous</button>
-            <button onclick="nextTestimonial()">Next</button>
         </section>
-        
+
         <section class="section">
             <h2>Ready to Elevate Your Event?</h2>
             <p>Contact us today to discuss your needs.</p>
             <a href="mailto:info@yourcompany.com"><button>Get in Touch</button></a>
         </section>
     </div>
-    
+
     <script>
+        // Auto-rotate through client testimonials
         let currentTestimonial = 0;
         const testimonials = document.querySelectorAll('.testimonial');
-        
+        let testimonialTimer;
+
         function showTestimonial(index) {
             testimonials.forEach((t, i) => {
                 t.classList.toggle('active', i === index);
             });
+            currentTestimonial = index;
         }
-        
+
         function nextTestimonial() {
-            currentTestimonial = (currentTestimonial + 1) % testimonials.length;
-            showTestimonial(currentTestimonial);
+            showTestimonial((currentTestimonial + 1) % testimonials.length);
+            restartTimer();
         }
-        
-        function prevTestimonial() {
-            currentTestimonial = (currentTestimonial - 1 + testimonials.length) % testimonials.length;
-            showTestimonial(currentTestimonial);
+
+        function restartTimer() {
+            clearInterval(testimonialTimer);
+            testimonialTimer = setInterval(() => {
+                showTestimonial((currentTestimonial + 1) % testimonials.length);
+            }, 7000);
+        }
+
+        if (testimonials.length > 1) {
+            restartTimer();
         }
     </script>
 </body>
