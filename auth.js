@@ -1,5 +1,6 @@
-// API configuration
-const API_BASE_URL = 'http://localhost:3000/api';
+// API configuration — config.js must be loaded BEFORE this script on every
+// page (it defines window.API_BASE_URL).
+const API_BASE_URL = window.API_BASE_URL;
 
 // Login handler
 async function handleLogin(event) {

@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Admin Panel - EventNov@</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Admin Panel - manage proposals and event types - EventNov@" />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Your external CSS -->
+  <link rel="stylesheet" href="style.css" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: "#0B1C2D",
+            greybg: "#F3F5F7",
+            charcoal: "#2B2E34",
+            accent: "#2EC4B6"
+          },
+          fontFamily: {
+            sans: ["Inter", "system-ui", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html {
+      scroll-behavior: smooth;
+    }
+
+    .form-input {
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .form-input:focus {
+      border-color: #2EC4B6;
+      box-shadow: 0 0 0 3px rgba(46, 196, 182, 0.15);
+      outline: none;
+    }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+    }
+
+    .hamburger span {
+      width: 25px;
+      height: 3px;
+      background-color: #0B1C2D;
+      margin: 3px 0;
+      transition: 0.3s;
+    }
+
+    .hamburger.active span:nth-child(1) {
+      transform: rotate(-45deg) translate(-5px, 6px);
+    }
+
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.active span:nth-child(3) {
+      transform: rotate(45deg) translate(-5px, -6px);
+    }
+
+    .nav-menu.mobile {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background-color: white;
+      flex-direction: column;
+      padding: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-menu.mobile.active {
+      display: flex;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hamburger {
+        display: flex;
+      }
+      .nav-menu.mobile {
+        display: none;
+      }
+      .nav-menu.mobile.active {
+        display: flex;
+      }
+    }
+  </style>
+
+  <script>
+    // Auth gate — runs BEFORE config.js / auth.js / any page logic.
+    // Only authenticated admins may stay here; everyone else goes to login.
+    (function requireAdmin() {
+      const token = localStorage.getItem('authToken');
+      let role = null;
+      try {
+        const stored = JSON.parse(localStorage.getItem('userData') || 'null');
+        role = stored && stored.role;
+      } catch (e) {
+        role = null; // corrupt/missing userData counts as not-an-admin
+      }
+      if (!token || role !== 'admin') {
+        window.location.replace('get-started.html#login');
+      }
+    })();
+  </script>
+</head>
+
+<body class="font-sans text-gray-900 bg-gray-50">
+
+<!-- Header -->
+<header class="fixed w-full bg-white border-b z-50">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    <a href="home.html" class="text-xl font-semibold text-navy">EventNov@</a>
+    <nav class="hidden md:flex items-center space-x-6 text-sm">
+      <a href="home.html" class="hover:text-accent transition">Home</a>
+      <a href="events.html" class="hover:text-accent transition">Event Types</a>
+      <a href="dashboard.html" class="hover:text-accent transition">Dashboard</a>
+      <a href="admin.html" class="text-accent font-semibold">Admin</a>
+      <button onclick="handleLogout()" class="text-red-600 hover:text-red-700 font-semibold">Logout</button>
+    </nav>
+    <!-- Mobile hamburger menu -->
+    <div class="hamburger md:hidden" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <nav class="nav-menu mobile" id="nav-menu">
+      <a href="home.html" class="py-2 hover:text-accent transition">Home</a>
+      <a href="events.html" class="py-2 hover:text-accent transition">Event Types</a>
+      <a href="dashboard.html" class="py-2 hover:text-accent transition">Dashboard</a>
+      <a href="admin.html" class="py-2 text-accent font-semibold">Admin</a>
+      <button onclick="handleLogout()" class="py-2 text-left text-red-600 font-semibold">Logout</button>
+    </nav>
+  </div>
+</header>
+
+<main class="pt-24 pb-12">
+  <div class="max-w-6xl mx-auto px-6">
+
+    <!-- Admin Panel Banner -->
+    <div class="bg-gradient-to-r from-navy via-teal-800 to-teal-600 rounded-2xl shadow-lg p-8 mb-8 text-white">
+      <h1 class="text-3xl font-bold mb-1">Admin Panel</h1>
+      <p class="text-white/75 mb-4">Review incoming event proposals and manage the event type catalogue shown on the Event Types page.</p>
+      <span id="admin-email" class="inline-flex items-center gap-1.5 bg-white/10 border border-white/25 rounded-full px-4 py-1.5 text-sm">🛡️ Admin</span>
+    </div>
+
+    <!-- Proposals Section -->
+    <section id="proposals-section" class="bg-white rounded-lg shadow-md p-8 mb-8">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+        <div>
+          <h2 class="text-2xl font-semibold text-gray-900">Proposals</h2>
+          <p class="text-sm text-gray-600 mt-1">Latest submissions, newest first. Change a status to keep track of who you have contacted.</p>
+        </div>
+        <button type="button" onclick="loadProposals()" class="shrink-0 px-4 py-2 text-sm bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 transition">Load Proposals</button>
+      </div>
+
+      <div id="proposals-message" class="hidden form-message mb-4"></div>
+
+      <!-- Loading state -->
+      <p id="proposals-loading" class="text-sm text-gray-600">Loading proposals...</p>
+
+      <!-- Table view (md and up) -->
+      <div class="hidden md:block overflow-x-auto">
+        <table class="w-full text-sm text-left">
+          <thead>
+            <tr class="border-b border-gray-200 text-gray-600">
+              <th class="py-3 pr-4 font-semibold">Name</th>
+              <th class="py-3 pr-4 font-semibold">Email</th>
+              <th class="py-3 pr-4 font-semibold">Company</th>
+              <th class="py-3 pr-4 font-semibold">Event Type</th>
+              <th class="py-3 pr-4 font-semibold">Event Date</th>
+              <th class="py-3 pr-4 font-semibold">Message</th>
+              <th class="py-3 font-semibold">Status</th>
+            </tr>
+          </thead>
+          <tbody id="proposals-tbody"></tbody>
+        </table>
+      </div>
+
+      <!-- Card view (below md) -->
+      <div id="proposals-cards" class="md:hidden space-y-4"></div>
+
+      <p id="proposals-empty" class="hidden text-sm text-gray-600">No proposals have been submitted yet.</p>
+    </section>
+
+    <!-- Events Manager Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-5 gap-6">
+
+      <!-- Event Types List -->
+      <div class="lg:col-span-3 bg-white rounded-lg shadow-md p-8">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
+          <h2 class="text-2xl font-semibold text-gray-900">Event Types</h2>
+          <button type="button" onclick="loadEvents()" class="shrink-0 px-4 py-2 text-sm bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 transition">Refresh</button>
+        </div>
+
+        <div id="events-loading" class="text-sm text-gray-600">Loading event types...</div>
+        <div id="events-list" class="space-y-4"></div>
+        <p id="events-empty" class="hidden text-sm text-gray-600">No event types yet. Add your first one with the form.</p>
+      </div>
+
+      <!-- Add / Edit Event Type Form -->
+      <div class="lg:col-span-2 bg-white rounded-lg shadow-md p-8">
+        <h3 id="event-form-title" class="text-lg font-semibold mb-1">Add Event Type</h3>
+        <p id="event-editing-info" class="hidden text-sm text-gray-500 break-all"></p>
+
+        <form id="event-form" class="space-y-4 mt-4" novalidate>
+          <div>
+            <label for="event-title" class="block text-sm font-medium text-gray-700 mb-2">Title <span class="text-red-500">*</span></label>
+            <input type="text" id="event-title" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg" maxlength="80" required>
+          </div>
+          <div>
+            <label for="event-category" class="block text-sm font-medium text-gray-700 mb-2">Category <span class="text-red-500">*</span></label>
+            <input type="text" id="event-category" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg" maxlength="40" required>
+          </div>
+          <div>
+            <label for="event-description" class="block text-sm font-medium text-gray-700 mb-2">Description <span class="text-red-500">*</span></label>
+            <textarea id="event-description" rows="3" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg" maxlength="500" required></textarea>
+          </div>
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label for="event-icon" class="block text-sm font-medium text-gray-700 mb-2">Icon</label>
+              <input type="text" id="event-icon" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg" maxlength="8" placeholder="🎉">
+            </div>
+            <div>
+              <label for="event-rating" class="block text-sm font-medium text-gray-700 mb-2">Rating (0–5)</label>
+              <input type="number" id="event-rating" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg" min="0" max="5" step="0.1">
+            </div>
+            <div>
+              <label for="event-reviews" class="block text-sm font-medium text-gray-700 mb-2">Reviews</label>
+              <input type="number" id="event-reviews" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg" min="0" step="1">
+            </div>
+            <div>
+              <label for="event-price" class="block text-sm font-medium text-gray-700 mb-2">Starting Price (₹)</label>
+              <input type="number" id="event-price" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg" min="0" step="1">
+            </div>
+          </div>
+          <div>
+            <label for="event-sortorder" class="block text-sm font-medium text-gray-700 mb-2">Sort Order</label>
+            <input type="number" id="event-sortorder" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg" step="1">
+          </div>
+          <div class="flex gap-3">
+            <button type="submit" id="event-submit-btn" class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition">Add Event Type</button>
+            <button type="button" id="cancel-edit-btn" class="hidden px-6 py-2 bg-gray-300 text-gray-900 rounded-lg hover:bg-gray-400 transition">Cancel</button>
+          </div>
+        </form>
+
+        <div id="events-message" class="hidden form-message"></div>
+      </div>
+    </div>
+
+  </div>
+</main>
+
+<!-- Footer -->
+<footer class="py-10 text-center text-sm text-gray-500 border-t bg-gray-50">
+  © <span id="footer-year"></span> EventNov@. All rights reserved.
+</footer>
+
+<!-- config.js MUST load before auth.js (auth.js reads window.API_BASE_URL),
+     then this page's inline script -->
+<script src="config.js"></script>
+<script src="./auth.js"></script>
+
+<script>
+  // window.API_BASE_URL is defined by config.js — do NOT declare a local
+  // API_BASE_URL here (auth.js already has a const with that name).
+
+  let cachedEvents = [];
+  let editingEventId = null; // null = add mode, otherwise PUT target id
+
+  const PROPOSAL_STATUSES = ['new', 'contacted', 'closed'];
+
+  document.addEventListener('DOMContentLoaded', () => {
+    // Footer year
+    const y = document.getElementById('footer-year');
+    if (y) y.textContent = new Date().getFullYear();
+
+    // Show the signed-in admin's email in the banner
+    try {
+      const me = JSON.parse(localStorage.getItem('userData') || 'null');
+      const emailEl = document.getElementById('admin-email');
+      if (me && me.email && emailEl) emailEl.textContent = `🛡️ ${me.email}`;
+    } catch (e) { /* non-fatal */ }
+
+    // Mobile hamburger nav
+    const hamburger = document.getElementById('hamburger');
+    const navMenu = document.getElementById('nav-menu');
+    if (hamburger && navMenu) {
+      hamburger.addEventListener('click', () => {
+        hamburger.classList.toggle('active');
+        navMenu.classList.toggle('active');
+      });
+    }
+
+    loadProposals();
+    loadEvents();
+
+    document.getElementById('event-form').addEventListener('submit', handleEventFormSubmit);
+    document.getElementById('cancel-edit-btn').addEventListener('click', resetEventForm);
+
+    // Delegated change handler for proposal status dropdowns (table + cards)
+    document.getElementById('proposals-section').addEventListener('change', (e) => {
+      const select = e.target.closest('select.proposal-status');
+      if (select) updateProposalStatus(select);
+    });
+
+    // Delegated clicks for Edit / Delete buttons on event cards
+    document.getElementById('events-list').addEventListener('click', (e) => {
+      const btn = e.target.closest('button[data-action]');
+      if (!btn) return;
+      if (btn.getAttribute('data-action') === 'edit') {
+        startEditEvent(btn.getAttribute('data-id'));
+      } else {
+        deleteEvent(btn.getAttribute('data-id'));
+      }
+    });
+  });
+
+  // ---------------------------------------------------------------------------
+  // Shared helpers
+  // ---------------------------------------------------------------------------
+
+  // Bearer auth headers — sent on EVERY request from this page
+  function authHeaders(json) {
+    const headers = {
+      'Authorization': `Bearer ${localStorage.getItem('authToken')}`
+    };
+    if (json) headers['Content-Type'] = 'application/json';
+    return headers;
+  }
+
+  // Escape HTML to prevent XSS — accepts any value, always returns a safe string
+  function escapeHtml(value) {
+    const text = String(value ?? '');
+    const map = {
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
+  }
+
+  // Single-line, truncated message preview
+  function messageSnippet(message, max = 90) {
+    const text = String(message ?? '').replace(/\s+/g, ' ').trim();
+    return text.length > max ? text.slice(0, max).trimEnd() + '…' : text;
+  }
+
+  // Safely format a date, or an em dash when absent/invalid
+  function formatDate(value) {
+    if (!value) return '—';
+    const d = new Date(value);
+    return isNaN(d.getTime()) ? '—' : d.toLocaleDateString();
+  }
+
+  // classList-safe message helper: never overwrites className, keeps the
+  // `form-message` hook class, reuses the element's existing classes
+  function showFormMessage(elementId, text, type) {
+    const messageDiv = document.getElementById(elementId);
+    if (!messageDiv) return;
+    messageDiv.textContent = text;
+    messageDiv.classList.remove(
+      'hidden',
+      'bg-green-50', 'text-green-700', 'border-green-200',
+      'bg-red-50', 'text-red-700', 'border-red-200'
+    );
+    const isSuccess = type === 'success';
+    messageDiv.classList.add(
+      'mt-4', 'p-3', 'rounded', 'border', 'text-sm',
+      isSuccess ? 'bg-green-50' : 'bg-red-50',
+      isSuccess ? 'text-green-700' : 'text-red-700',
+      isSuccess ? 'border-green-200' : 'border-red-200'
+    );
+  }
+
+  // 401 means the token is dead — clear state and send the user to login
+  function handleAuthFailure(response) {
+    if (response.status === 401) {
+      localStorage.removeItem('authToken');
+      localStorage.removeItem('userData');
+      window.location.href = 'get-started.html#login';
+      return true;
+    }
+    return false;
+  }
+
+  // Parse a JSON body defensively (a 500 HTML page must not throw past us)
+  async function readJson(response) {
+    try {
+      return await response.json();
+    } catch (e) {
+      return {};
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Proposals
+  // ---------------------------------------------------------------------------
+
+  async function loadProposals() {
+    const loadingEl = document.getElementById('proposals-loading');
+    const emptyEl = document.getElementById('proposals-empty');
+    loadingEl.classList.remove('hidden');
+    emptyEl.classList.add('hidden');
+
+    try {
+      const response = await fetch(`${window.API_BASE_URL}/proposals`, {
+        headers: authHeaders(false)
+      });
+      if (handleAuthFailure(response)) return;
+
+      const data = await readJson(response);
+
+      if (data.success) {
+        renderProposals(data.proposals || []);
+      } else {
+        showFormMessage('proposals-message', data.message || 'Failed to load proposals', 'error');
+        renderProposals([]);
+      }
+    } catch (error) {
+      console.error('Error loading proposals:', error);
+      showFormMessage('proposals-message', 'Failed to load proposals. Is the backend running?', 'error');
+      renderProposals([]);
+    } finally {
+      loadingEl.classList.add('hidden');
+    }
+  }
+
+  function statusSelect(p) {
+    const id = escapeHtml(String(p._id || ''));
+    const current = PROPOSAL_STATUSES.includes(p.status) ? p.status : 'new';
+    const options = PROPOSAL_STATUSES
+      .map(s => `<option value="${s}"${s === current ? ' selected' : ''}>${s}</option>`)
+      .join('');
+    return `
+      <select data-id="${id}" data-current="${current}"
+        class="proposal-status form-input capitalize border border-gray-300 rounded-lg px-2 py-1.5 text-sm bg-white shrink-0">
+        ${options}
+      </select>
+    `;
+  }
+
+  function renderProposals(proposals) {
+    const tbody = document.getElementById('proposals-tbody');
+    const cards = document.getElementById('proposals-cards');
+    const emptyEl = document.getElementById('proposals-empty');
+
+    if (!proposals.length) {
+      tbody.innerHTML = '';
+      cards.innerHTML = '';
+      emptyEl.classList.remove('hidden');
+      return;
+    }
+    emptyEl.classList.add('hidden');
+
+    // Table rows (md and up)
+    tbody.innerHTML = proposals.map(p => `
+      <tr class="border-b border-gray-100 align-top hover:bg-gray-50">
+        <td class="py-3 pr-4">
+          <p class="font-semibold text-gray-900">${escapeHtml(p.full_name || '—')}</p>
+          <p class="text-xs text-gray-500 mt-0.5">Submitted ${escapeHtml(formatDate(p.createdAt))}</p>
+        </td>
+        <td class="py-3 pr-4 text-gray-700 break-all">${escapeHtml(p.email || '—')}</td>
+        <td class="py-3 pr-4 text-gray-700">${escapeHtml(p.company || '—')}</td>
+        <td class="py-3 pr-4 text-gray-700">${escapeHtml(p.event_type || '—')}</td>
+        <td class="py-3 pr-4 text-gray-700">${escapeHtml(formatDate(p.event_date))}</td>
+        <td class="py-3 pr-4 text-gray-700 max-w-[16rem]" title="${escapeHtml(String(p.message ?? ''))}">${escapeHtml(messageSnippet(p.message))}</td>
+        <td class="py-3">${statusSelect(p)}</td>
+      </tr>
+    `).join('');
+
+    // Mobile cards (below md)
+    cards.innerHTML = proposals.map(p => `
+      <div class="border border-gray-200 rounded-lg p-4 space-y-2 text-sm">
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <p class="font-semibold text-gray-900">${escapeHtml(p.full_name || '—')}</p>
+            <p class="text-gray-600 break-all">${escapeHtml(p.email || '—')}</p>
+          </div>
+          ${statusSelect(p)}
+        </div>
+        <p class="text-gray-600">🏢 ${escapeHtml(p.company || '—')} · ${escapeHtml(p.event_type || '—')}</p>
+        <p class="text-gray-600">📅 Event date: ${escapeHtml(formatDate(p.event_date))} · Submitted ${escapeHtml(formatDate(p.createdAt))}</p>
+        <p class="text-gray-700" title="${escapeHtml(String(p.message ?? ''))}">${escapeHtml(messageSnippet(p.message, 120))}</p>
+      </div>
+    `).join('');
+  }
+
+  async function updateProposalStatus(select) {
+    const id = select.getAttribute('data-id');
+    const previous = select.getAttribute('data-current') || 'new';
+    const status = select.value;
+
+    select.disabled = true;
+    try {
+      const response = await fetch(`${window.API_BASE_URL}/proposals/${encodeURIComponent(id)}/status`, {
+        method: 'PATCH',
+        headers: authHeaders(true),
+        body: JSON.stringify({ status })
+      });
+      if (handleAuthFailure(response)) return;
+
+      const data = await readJson(response);
+
+      if (data.success) {
+        // Keep every dropdown for this proposal (table + card view) in sync
+        document.querySelectorAll('select.proposal-status').forEach(sel => {
+          if (sel.getAttribute('data-id') === id) {
+            sel.value = status;
+            sel.setAttribute('data-current', status);
+          }
+        });
+        showFormMessage('proposals-message', data.message || `Proposal status updated to "${status}"`, 'success');
+      } else {
+        // Revert the dropdown to the stored value on failure
+        select.value = previous;
+        showFormMessage('proposals-message', data.message || 'Failed to update status', 'error');
+      }
+    } catch (error) {
+      console.error('Error updating proposal status:', error);
+      select.value = previous;
+      showFormMessage('proposals-message', 'Error updating status. Is the backend running?', 'error');
+    } finally {
+      select.disabled = false;
+    }
+  }
+
+  // ---------------------------------------------------------------------------
+  // Event Types manager
+  // ---------------------------------------------------------------------------
+
+  async function loadEvents() {
+    const loadingEl = document.getElementById('events-loading');
+    const emptyEl = document.getElementById('events-empty');
+    loadingEl.classList.remove('hidden');
+    emptyEl.classList.add('hidden');
+
+    try {
+      // GET /api/events is public, but the Bearer header is still sent for
+      // consistency with every other call on this page
+      const response = await fetch(`${window.API_BASE_URL}/events`, {
+        headers: authHeaders(false)
+      });
+      if (handleAuthFailure(response)) return;
+
+      const data = await readJson(response);
+
+      if (data.success) {
+        cachedEvents = data.events || [];
+        renderEvents(cachedEvents);
+      } else {
+        showFormMessage('events-message', data.message || 'Failed to load event types', 'error');
+        renderEvents([]);
+      }
+    } catch (error) {
+      console.error('Error loading event types:', error);
+      showFormMessage('events-message', 'Failed to load event types. Is the backend running?', 'error');
+      renderEvents([]);
+    } finally {
+      loadingEl.classList.add('hidden');
+    }
+  }
+
+  function renderEvents(events) {
+    const listEl = document.getElementById('events-list');
+    const emptyEl = document.getElementById('events-empty');
+
+    if (!events.length) {
+      listEl.innerHTML = '';
+      emptyEl.classList.remove('hidden');
+      return;
+    }
+    emptyEl.classList.add('hidden');
+
+    listEl.innerHTML = events.map(ev => `
+      <div class="border border-gray-200 rounded-lg p-4 flex flex-col sm:flex-row sm:items-start gap-4">
+        <div class="w-12 h-12 shrink-0 rounded-full bg-gray-50 border border-gray-200 flex items-center justify-center text-2xl" aria-hidden="true">${escapeHtml(ev.icon || '🎉')}</div>
+        <div class="flex-1 min-w-0">
+          <div class="flex flex-wrap items-center gap-2 mb-1">
+            <p class="font-semibold text-gray-900 break-all">${escapeHtml(ev.title || '—')}</p>
+            <span class="text-xs bg-teal-50 text-teal-700 border border-teal-200 rounded-full px-2.5 py-0.5">${escapeHtml(ev.category || '—')}</span>
+          </div>
+          <p class="text-sm text-gray-600 mb-2">${escapeHtml(ev.description || '')}</p>
+          <p class="text-xs text-gray-500">
+            ★ ${escapeHtml(Number(ev.rating ?? 0).toFixed(1))} (${escapeHtml(String(ev.reviews ?? 0))} reviews)
+            · Starting from ₹${escapeHtml(Number(ev.startingPrice ?? 0).toLocaleString('en-IN'))}
+            · Sort order: ${escapeHtml(String(ev.sortOrder ?? 0))}
+          </p>
+        </div>
+        <div class="flex sm:flex-col gap-2 shrink-0">
+          <button type="button" data-action="edit" data-id="${escapeHtml(String(ev._id || ''))}" class="px-3 py-1.5 text-sm bg-gray-200 text-gray-900 rounded-lg hover:bg-gray-300 transition">Edit</button>
+          <button type="button" data-action="delete" data-id="${escapeHtml(String(ev._id || ''))}" class="px-3 py-1.5 text-sm bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition">Delete</button>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function buildEventPayloadFromForm() {
+    const payload = {
+      title: document.getElementById('event-title').value.trim(),
+      category: document.getElementById('event-category').value.trim(),
+      description: document.getElementById('event-description').value.trim()
+    };
+
+    // Optional icon/numeric fields are only sent when filled in, so backend
+    // defaults survive create and untouched values survive edit
+    const icon = document.getElementById('event-icon').value.trim();
+    if (icon !== '') payload.icon = icon;
+
+    const numericFields = [
+      ['event-rating', 'rating'],
+      ['event-reviews', 'reviews'],
+      ['event-price', 'startingPrice'],
+      ['event-sortorder', 'sortOrder']
+    ];
+    numericFields.forEach(([inputId, key]) => {
+      const raw = document.getElementById(inputId).value.trim();
+      if (raw !== '') payload[key] = Number(raw);
+    });
+
+    return payload;
+  }
+
+  async function handleEventFormSubmit(e) {
+    e.preventDefault();
+
+    const payload = buildEventPayloadFromForm();
+    if (!payload.title || !payload.category || !payload.description) {
+      showFormMessage('events-message', 'Title, category and description are required', 'error');
+      return;
+    }
+
+    const rating = payload.rating;
+    if (rating !== undefined && (isNaN(rating) || rating < 0 || rating > 5)) {
+      showFormMessage('events-message', 'Rating must be a number between 0 and 5', 'error');
+      return;
+    }
+    for (const key of ['reviews', 'startingPrice']) {
+      if (payload[key] !== undefined && (isNaN(payload[key]) || payload[key] < 0)) {
+        showFormMessage('events-message', `${key === 'reviews' ? 'Reviews' : 'Starting price'} must be a number of 0 or more`, 'error');
+        return;
+      }
+    }
+    if (payload.sortOrder !== undefined && isNaN(payload.sortOrder)) {
+      showFormMessage('events-message', 'Sort order must be a number', 'error');
+      return;
+    }
+
+    const isEdit = editingEventId !== null;
+    const url = isEdit
+      ? `${window.API_BASE_URL}/events/${encodeURIComponent(editingEventId)}`
+      : `${window.API_BASE_URL}/events`;
+
+    const submitBtn = document.getElementById('event-submit-btn');
+    submitBtn.disabled = true;
+
+    try {
+      const response = await fetch(url, {
+        method: isEdit ? 'PUT' : 'POST',
+        headers: authHeaders(true),
+        body: JSON.stringify(payload)
+      });
+      if (handleAuthFailure(response)) return;
+
+      const data = await readJson(response);
+
+      if (data.success) {
+        showFormMessage('events-message', data.message || (isEdit ? 'Event type updated' : 'Event type created'), 'success');
+        resetEventForm();
+        loadEvents(); // refresh the list after the mutation
+      } else {
+        showFormMessage('events-message', data.message || 'Failed to save event type', 'error');
+      }
+    } catch (error) {
+      console.error('Error saving event type:', error);
+      showFormMessage('events-message', 'Error saving event type. Is the backend running?', 'error');
+    } finally {
+      submitBtn.disabled = false;
+    }
+  }
+
+  function startEditEvent(id) {
+    const ev = cachedEvents.find(item => String(item._id) === String(id));
+    if (!ev) return;
+
+    editingEventId = String(ev._id);
+    document.getElementById('event-title').value = ev.title || '';
+    document.getElementById('event-category').value = ev.category || '';
+    document.getElementById('event-description').value = ev.description || '';
+    document.getElementById('event-icon').value = ev.icon || '';
+    document.getElementById('event-rating').value = ev.rating ?? '';
+    document.getElementById('event-reviews').value = ev.reviews ?? '';
+    document.getElementById('event-price').value = ev.startingPrice ?? '';
+    document.getElementById('event-sortorder').value = ev.sortOrder ?? '';
+
+    document.getElementById('event-form-title').textContent = 'Edit Event Type';
+    document.getElementById('event-submit-btn').textContent = 'Update Event Type';
+    const info = document.getElementById('event-editing-info');
+    info.textContent = `Editing: ${ev.title || ''}`;
+    info.classList.remove('hidden');
+    document.getElementById('cancel-edit-btn').classList.remove('hidden');
+
+    document.getElementById('event-form').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+
+  function resetEventForm() {
+    editingEventId = null;
+    document.getElementById('event-form').reset();
+    document.getElementById('event-form-title').textContent = 'Add Event Type';
+    document.getElementById('event-submit-btn').textContent = 'Add Event Type';
+    const info = document.getElementById('event-editing-info');
+    info.textContent = '';
+    info.classList.add('hidden');
+    document.getElementById('cancel-edit-btn').classList.add('hidden');
+  }
+
+  async function deleteEvent(id) {
+    const ev = cachedEvents.find(item => String(item._id) === String(id));
+    const label = ev && ev.title ? `"${ev.title}"` : 'this event type';
+    if (!window.confirm(`Delete ${label}? This cannot be undone.`)) return;
+
+    try {
+      const response = await fetch(`${window.API_BASE_URL}/events/${encodeURIComponent(id)}`, {
+        method: 'DELETE',
+        headers: authHeaders(false)
+      });
+      if (handleAuthFailure(response)) return;
+
+      const data = await readJson(response);
+
+      if (data.success) {
+        // If the deleted item was being edited, drop back to add mode
+        if (editingEventId && editingEventId === String(id)) resetEventForm();
+        showFormMessage('events-message', data.message || 'Event type deleted', 'success');
+        loadEvents(); // refresh the list after the mutation
+      } else {
+        showFormMessage('events-message', data.message || 'Failed to delete event type', 'error');
+      }
+    } catch (error) {
+      console.error('Error deleting event type:', error);
+      showFormMessage('events-message', 'Error deleting event type. Is the backend running?', 'error');
+    }
+  }
+</script>
+
+</body>
+</html>

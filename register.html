@@ -5,6 +5,7 @@
   <title>Register - EventNov@</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Register for a EventNov@ account." />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
   
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -186,7 +187,7 @@
         <div class="flex items-start">
           <input type="checkbox" id="terms" name="terms" class="mr-2 mt-1" required>
           <label for="terms" class="text-sm text-gray-600">
-            I agree to the <a href="#" class="text-accent hover:underline">Terms of Service</a> and <a href="#" class="text-accent hover:underline">Privacy Policy</a>.
+            I agree to the <a href="terms.html" class="text-accent hover:underline">Terms of Service</a> and <a href="privacy.html" class="text-accent hover:underline">Privacy Policy</a>.
           </label>
         </div>
         <button type="submit" class="btn-submit w-full bg-navy text-white py-3 px-6 rounded-lg font-semibold hover:bg-opacity-90">Register</button>
@@ -200,7 +201,7 @@
 </section>
 
 <footer class="py-10 text-center text-sm text-gray-500 border-t">
-  © 2026 EventNov@. All rights reserved. <a href="#" class="hover:text-accent">Privacy Policy</a> | <a href="#" class="hover:text-accent">Terms of Service</a>
+  © <span id="footer-year"></span> EventNov@. All rights reserved. <a href="privacy.html" class="hover:text-accent">Privacy Policy</a> | <a href="terms.html" class="hover:text-accent">Terms of Service</a>
 </footer>
 
 <script>
@@ -211,7 +212,14 @@
     hamburger.classList.toggle('active');
     navMenu.classList.toggle('active');
   });
+
+  // Footer year
+  const y = document.getElementById('footer-year');
+  if (y) y.textContent = new Date().getFullYear();
 </script>
+
+<!-- API base URL (must load before auth.js) -->
+<script src="config.js"></script>
 
 <!-- Authentication Script -->
 <script src="./auth.js"></script>

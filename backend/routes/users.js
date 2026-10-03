@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const User = require('../models/User');
+const Proposal = require('../models/Proposal');
 const { verifyToken } = require('../middleware/auth');
 
 // Get current user profile
@@ -176,11 +177,6 @@ router.delete('/account', verifyToken, async (req, res) => {
       });
     }
 
-    if (req.session) {
-      req.session.destroy();
-    }
-    res.clearCookie('connect.sid');
-
     res.status(200).json({
       success: true,
       message: 'Account deleted successfully'
@@ -190,6 +186,26 @@ router.delete('/account', verifyToken, async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to delete account'
+    });
+  }
+});
+
+// Get current user's event proposals (newest first)
+router.get('/my-proposals', verifyToken, async (req, res) => {
+  try {
+    const proposals = await Proposal.find({ userId: req.userId })
+      .sort({ createdAt: -1 })
+      .limit(50);
+
+    res.status(200).json({
+      success: true,
+      proposals
+    });
+  } catch (error) {
+    console.error('Error fetching user proposals:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch your proposals'
     });
   }
 });

@@ -2,10 +2,16 @@ const express = require('express');
 const mongoose = require('mongoose');
 const router = express.Router();
 const Proposal = require('../models/Proposal');
+const { verifyToken, verifyTokenOptional, requireAdmin } = require('../middleware/auth');
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[A-Za-z]{2,}$/;
 
-// Public booking proposal endpoint (no auth).
+// Optional auth for the whole router: links a logged-in submitter to their
+// proposal when a valid Bearer token is present, otherwise continues without
+// req.userId (never rejects).
+router.use(verifyTokenOptional);
+
+// Public booking proposal endpoint (auth optional).
 // Rate limiting for this route is mounted in server.js (5 requests / 1 hour).
 router.post('/', async (req, res) => {
   try {
@@ -73,7 +79,9 @@ router.post('/', async (req, res) => {
       ...(phone ? { phone } : {}),
       ...(event_date ? { event_date: new Date(event_date) } : {}),
       ...(Number.isFinite(guestCount) ? { guests: guestCount } : {}),
-      ...(message ? { message } : {})
+      ...(message ? { message } : {}),
+      // Link the proposal to the submitter when a valid token was provided
+      ...(req.userId ? { userId: req.userId } : {})
     });
 
     await proposal.save();
@@ -96,6 +104,75 @@ router.post('/', async (req, res) => {
     res.status(500).json({
       success: false,
       message: 'Failed to submit proposal'
+    });
+  }
+});
+
+// Admin: list all proposals, newest first (max 100).
+router.get('/', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    const proposals = await Proposal.find({})
+      .sort({ createdAt: -1 })
+      .limit(100);
+
+    res.status(200).json({
+      success: true,
+      proposals
+    });
+  } catch (error) {
+    console.error('List proposals error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to load proposals'
+    });
+  }
+});
+
+// Admin: update a proposal's status.
+const ALLOWED_STATUSES = ['new', 'contacted', 'closed'];
+
+router.patch('/:id/status', verifyToken, requireAdmin, async (req, res) => {
+  try {
+    const { status } = req.body;
+
+    if (!ALLOWED_STATUSES.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Status must be one of: new, contacted, closed'
+      });
+    }
+
+    const proposal = await Proposal.findByIdAndUpdate(
+      req.params.id,
+      { status },
+      { new: true, runValidators: true }
+    );
+
+    if (!proposal) {
+      return res.status(404).json({
+        success: false,
+        message: 'Proposal not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Status updated',
+      proposal
+    });
+  } catch (error) {
+    console.error('Update proposal status error:', error);
+
+    if (error instanceof mongoose.Error.CastError) {
+      return res.status(404).json({
+        success: false,
+        message: 'Proposal not found'
+      });
+    }
+
+    res.status(500).json({
+      success: false,
+      message: 'Failed to update proposal status'
     });
   }
 });

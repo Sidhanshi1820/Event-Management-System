@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Terms of Service - EventNov@</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="The terms and conditions that govern your use of the EventNov@ corporate event planning service." />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <link rel="stylesheet" href="style.css" />
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: "#0B1C2D",
+            greybg: "#F3F5F7",
+            charcoal: "#2B2E34",
+            accent: "#2EC4B6"
+          },
+          fontFamily: {
+            sans: ["Inter", "system-ui", "sans-serif"]
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    html { scroll-behavior: smooth; }
+    .hamburger { display: none; flex-direction: column; cursor: pointer; }
+    .hamburger span { width: 25px; height: 3px; background-color: #0B1C2D; margin: 3px 0; transition: 0.3s; }
+    .hamburger.active span:nth-child(1) { transform: rotate(-45deg) translate(-5px, 6px); }
+    .hamburger.active span:nth-child(2) { opacity: 0; }
+    .hamburger.active span:nth-child(3) { transform: rotate(45deg) translate(-5px, -6px); }
+    .nav-menu { display: flex; }
+    .nav-menu.mobile { display: none; position: absolute; top: 100%; left: 0; width: 100%; background-color: white; flex-direction: column; padding: 1rem; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); }
+    .nav-menu.mobile.active { display: flex; }
+    @media (max-width: 768px) { .hamburger { display: flex; } .nav-menu { display: none; } }
+  </style>
+</head>
+
+<body class="font-sans text-charcoal bg-greybg">
+<header class="fixed w-full bg-white/90 backdrop-blur border-b z-50">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+    <a href="home.html" class="text-xl font-semibold text-navy">EventNov@</a>
+    <nav class="space-x-6 hidden md:flex text-sm">
+      <a href="home.html" class="hover:text-accent transition">Home</a>
+      <a href="services.html" class="hover:text-accent transition">Services</a>
+      <a href="about.html" class="hover:text-accent transition">About</a>
+      <a href="contact.html" class="hover:text-accent transition">Contact</a>
+      <a href="get-started.html#login" class="hover:text-accent transition">Login</a>
+    </nav>
+    <!-- Mobile hamburger menu -->
+    <div class="hamburger md:hidden" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <nav class="nav-menu mobile" id="nav-menu">
+      <a href="home.html" class="py-2 hover:text-accent transition">Home</a>
+      <a href="services.html" class="py-2 hover:text-accent transition">Services</a>
+      <a href="about.html" class="py-2 hover:text-accent transition">About</a>
+      <a href="contact.html" class="py-2 hover:text-accent transition">Contact</a>
+      <a href="get-started.html#login" class="py-2 hover:text-accent transition">Login</a>
+    </nav>
+  </div>
+</header>
+
+<section class="pt-40 pb-10 bg-greybg text-center">
+  <h1 class="text-4xl md:text-5xl font-bold text-navy mb-3">Terms of Service</h1>
+  <p class="text-sm text-gray-500">Last updated: October 2026</p>
+</section>
+
+<section class="pb-20 bg-greybg">
+  <div class="max-w-3xl mx-auto px-6">
+    <h2 class="text-2xl font-semibold text-navy mb-3">Acceptance of Terms</h2>
+    <p class="text-gray-600 leading-relaxed mb-10">By accessing or using EventNov@ you agree to be bound by these Terms of Service. If you do not agree with any part of these terms, please do not use our website or services. These terms apply to every visitor, registered user and client.</p>
+    <h2 class="text-2xl font-semibold text-navy mb-3">Our Services</h2>
+    <p class="text-gray-600 leading-relaxed mb-10">EventNov@ provides corporate event planning and management services, including conferences, product launches, offsites and company celebrations. We do not provide wedding or private-party services. Any request outside our corporate focus may be declined at our discretion.</p>
+    <h2 class="text-2xl font-semibold text-navy mb-3">Accounts</h2>
+    <p class="text-gray-600 leading-relaxed mb-10">You agree to provide accurate and current information when creating an account, and to keep your password confidential. You are responsible for all activity that occurs under your account. Notify us immediately if you suspect unauthorised use of your account.</p>
+    <h2 class="text-2xl font-semibold text-navy mb-3">Bookings &amp; Proposals</h2>
+    <p class="text-gray-600 leading-relaxed mb-10">Submitting a proposal request through this website is a request for a quote only, and does not confirm a booking. A booking exists only once the scope, date and price have been agreed with you in writing. Prices in proposals are valid for the period stated in the quote.</p>
+    <h2 class="text-2xl font-semibold text-navy mb-3">Payments &amp; Cancellations</h2>
+    <p class="text-gray-600 leading-relaxed mb-10">All quotes are itemised so you can see exactly what each component of your event costs. Payment schedules and cancellation terms are agreed per event contract, and vary with vendor commitments. Please review the cancellation clause of your event contract before confirming.</p>
+    <h2 class="text-2xl font-semibold text-navy mb-3">Intellectual Property</h2>
+    <p class="text-gray-600 leading-relaxed mb-10">All content on this website, including text, graphics, logos and design, is the property of EventNov@ or its licensors. You may not copy, reuse or distribute our materials without prior written permission.</p>
+    <h2 class="text-2xl font-semibold text-navy mb-3">Limitation of Liability</h2>
+    <p class="text-gray-600 leading-relaxed mb-10">Our services are provided on an "as is" basis, and to the maximum extent permitted by law EventNov@ is not liable for indirect or consequential losses. Our total liability for any claim is limited to the fees you paid for the event giving rise to that claim.</p>
+    <h2 class="text-2xl font-semibold text-navy mb-3">Changes to These Terms</h2>
+    <p class="text-gray-600 leading-relaxed mb-10">We may update these terms from time to time, and will publish the latest version on this page. Continued use of the website or services after changes take effect constitutes acceptance of the revised terms.</p>
+    <h2 class="text-2xl font-semibold text-navy mb-3">Contact Us</h2>
+    <p class="text-gray-600 leading-relaxed">Questions about these terms? Email us at <a href="mailto:info@eventova.com" class="text-accent hover:underline">info@eventova.com</a> and we will get back to you as soon as possible.</p>
+  </div>
+</section>
+
+<footer class="py-10 text-center text-sm text-gray-500 border-t bg-white">
+  © <span id="footer-year"></span> EventNov@. All rights reserved. <a href="privacy.html" class="hover:text-accent">Privacy Policy</a> | <a href="terms.html" class="hover:text-accent">Terms of Service</a>
+</footer>
+
+<script>
+  const hamburger = document.getElementById('hamburger');
+  const navMenu = document.getElementById('nav-menu');
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('active');
+    navMenu.classList.toggle('active');
+  });
+  const y = document.getElementById('footer-year');
+  if (y) y.textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>

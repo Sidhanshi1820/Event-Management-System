@@ -5,6 +5,7 @@
   <title>Dashboard - EventNov@</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="User Dashboard - EventNov@" />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
   
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -44,6 +45,69 @@
       box-shadow: 0 0 0 3px rgba(46, 196, 182, 0.15);
       outline: none;
     }
+
+    /* Hamburger menu */
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      cursor: pointer;
+    }
+
+    .hamburger span {
+      width: 25px;
+      height: 3px;
+      background-color: #0B1C2D;
+      margin: 3px 0;
+      transition: 0.3s;
+    }
+
+    .hamburger.active span:nth-child(1) {
+      transform: rotate(-45deg) translate(-5px, 6px);
+    }
+
+    .hamburger.active span:nth-child(2) {
+      opacity: 0;
+    }
+
+    .hamburger.active span:nth-child(3) {
+      transform: rotate(45deg) translate(-5px, -6px);
+    }
+
+    .nav-menu {
+      display: flex;
+    }
+
+    .nav-menu.mobile {
+      display: none;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      width: 100%;
+      background-color: white;
+      flex-direction: column;
+      padding: 1rem;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+
+    .nav-menu.mobile.active {
+      display: flex;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .hamburger {
+        display: flex;
+      }
+      .nav-menu {
+        display: none;
+      }
+      .nav-menu.mobile {
+        display: none;
+      }
+      .nav-menu.mobile.active {
+        display: flex;
+      }
+    }
   </style>
 </head>
 
@@ -59,6 +123,19 @@
       <a href="services.html" class="hover:text-accent transition">Services</a>
       <a href="dashboard.html" class="hover:text-accent transition">Dashboard</a>
       <button onclick="handleLogout()" class="text-red-600 hover:text-red-700 font-semibold">Logout</button>
+    </nav>
+    <!-- Mobile hamburger menu -->
+    <div class="hamburger md:hidden" id="hamburger">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <nav class="nav-menu mobile" id="nav-menu">
+      <a href="home.html" class="py-2 hover:text-accent transition">Home</a>
+      <a href="events.html" class="py-2 hover:text-accent transition">Event Types</a>
+      <a href="services.html" class="py-2 hover:text-accent transition">Services</a>
+      <a href="dashboard.html" class="py-2 hover:text-accent transition">Dashboard</a>
+      <button type="button" onclick="handleLogout()" class="py-2 text-left text-red-600 hover:text-red-700 font-semibold">Logout</button>
     </nav>
   </div>
 </header>
@@ -173,19 +250,40 @@
         </div>
       </div>
     </div>
+
+    <!-- My Event Requests -->
+    <div class="bg-white rounded-lg shadow-md p-8 mb-8">
+      <h3 class="text-lg font-semibold mb-6">My Event Requests</h3>
+      <div id="my-proposals" class="space-y-3">
+        <p class="text-sm text-gray-600">Loading...</p>
+      </div>
+    </div>
   </div>
 </main>
 
 <!-- Footer -->
 <footer class="py-10 text-center text-sm text-gray-500 border-t">
-  © 2026 EventNov@. All rights reserved.
+  © <span id="footer-year"></span> EventNov@. All rights reserved.
 </footer>
 
+<script src="config.js"></script>
 <script src="./auth.js"></script>
 
 <script>
-  // API_BASE_URL is already declared in auth.js — redeclaring it here would
-  // throw a duplicate-const SyntaxError and kill this entire script
+  // window.API_BASE_URL is set by config.js, which is loaded before auth.js.
+  // Never declare a local `const API_BASE_URL` here — top-level consts are
+  // shared across all classic scripts on the page and a duplicate declaration
+  // would throw a SyntaxError that kills this entire script.
+
+  // Mobile hamburger menu toggle
+  const hamburger = document.getElementById('hamburger');
+  const navMenu = document.getElementById('nav-menu');
+  if (hamburger && navMenu) {
+    hamburger.addEventListener('click', () => {
+      hamburger.classList.toggle('active');
+      navMenu.classList.toggle('active');
+    });
+  }
 
   // Load profile on page load
   document.addEventListener('DOMContentLoaded', () => {
@@ -200,7 +298,12 @@
 
     loadUserProfile();
     loadLoginHistory();
+    loadMyProposals();
     setupEventListeners();
+
+    // Footer year
+    const y = document.getElementById('footer-year');
+    if (y) y.textContent = new Date().getFullYear();
   });
 
   // Check if user is logged in
@@ -216,7 +319,7 @@
     
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`${API_BASE_URL}/users/profile`, {
+      const response = await fetch(`${window.API_BASE_URL}/users/profile`, {
         headers: {
           'Authorization': `Bearer ${token}`
         },
@@ -349,7 +452,7 @@
 
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`${API_BASE_URL}/users/profile`, {
+      const response = await fetch(`${window.API_BASE_URL}/users/profile`, {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -394,7 +497,7 @@
 
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`${API_BASE_URL}/users/change-password`, {
+      const response = await fetch(`${window.API_BASE_URL}/users/change-password`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -430,7 +533,7 @@
   async function loadLoginHistory() {
     try {
       const token = localStorage.getItem('authToken');
-      const response = await fetch(`${API_BASE_URL}/auth/login-history`, {
+      const response = await fetch(`${window.API_BASE_URL}/auth/login-history`, {
         headers: {
           'Authorization': `Bearer ${token}`
         },
@@ -458,6 +561,72 @@
         <p class="text-gray-600">IP: ${escapeHtml(String(entry.ipAddress ?? '—'))}</p>
       </div>
     `).join('');
+  }
+
+  // Load the user's submitted event requests (proposals)
+  async function loadMyProposals() {
+    const container = document.getElementById('my-proposals');
+
+    try {
+      const token = localStorage.getItem('authToken');
+      const response = await fetch(`${window.API_BASE_URL}/users/my-proposals`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        credentials: 'include'
+      });
+
+      const data = await response.json();
+
+      // Handle a failed request or a malformed (non-array) payload gracefully
+      if (!data.success || !Array.isArray(data.proposals)) {
+        container.innerHTML = '<p class="text-sm text-gray-600">Could not load your requests.</p>';
+        return;
+      }
+
+      if (data.proposals.length === 0) {
+        container.innerHTML = '<p class="text-sm text-gray-600">You haven\'t submitted any event requests yet. <a href="events.html" class="text-accent hover:underline">Browse event types</a> to get started.</p>';
+        return;
+      }
+
+      container.innerHTML = data.proposals.map(renderProposalCard).join('');
+    } catch (error) {
+      console.error('Error loading your event requests:', error);
+      container.innerHTML = '<p class="text-sm text-gray-600">Could not load your requests.</p>';
+    }
+  }
+
+  // Render a single event request card with a colored status badge
+  // (new = blue, contacted = amber, closed = gray)
+  function renderProposalCard(proposal) {
+    const badgeClasses = {
+      new: 'bg-blue-100 text-blue-700',
+      contacted: 'bg-amber-100 text-amber-700',
+      closed: 'bg-gray-100 text-gray-600'
+    };
+    const status = String(proposal.status || 'new').toLowerCase();
+    const badgeClass = badgeClasses[status] || badgeClasses.new;
+    const eventType = proposal.event_type ? escapeHtml(String(proposal.event_type)) : '—';
+    const fullName = proposal.full_name ? escapeHtml(String(proposal.full_name)) : '—';
+    const company = proposal.company ? escapeHtml(String(proposal.company)) : '';
+    const submitted = proposal.createdAt && !isNaN(new Date(proposal.createdAt))
+      ? escapeHtml(new Date(proposal.createdAt).toLocaleDateString())
+      : '—';
+    const eventDate = proposal.event_date && !isNaN(new Date(proposal.event_date))
+      ? `<p class="text-gray-500 text-xs mt-0.5">Event date: ${escapeHtml(new Date(proposal.event_date).toLocaleDateString())}</p>`
+      : '';
+
+    return `
+      <div class="bg-gray-50 p-4 rounded-lg text-sm">
+        <div class="flex items-center justify-between gap-3 flex-wrap">
+          <p class="font-semibold text-gray-900">${eventType}</p>
+          <span class="inline-block rounded-full px-3 py-0.5 text-xs font-semibold capitalize ${badgeClass}">${escapeHtml(status)}</span>
+        </div>
+        <p class="text-gray-600 mt-1">${fullName}${company ? ` · ${company}` : ''}</p>
+        <p class="text-gray-500 text-xs mt-1">Submitted: ${submitted}</p>
+        ${eventDate}
+      </div>
+    `;
   }
 
   // Setup event listeners

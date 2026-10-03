@@ -15,6 +15,12 @@
   <!-- Your external CSS -->
   <link rel="stylesheet" href="style.css" />
 
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+
+  <!-- API base URL config (must load before any script that calls the API) -->
+  <script src="config.js"></script>
+
   <script>
     tailwind.config = {
       theme: {
@@ -448,7 +454,7 @@
 </section>
 
 <footer class="py-10 text-center text-sm text-gray-500 border-t bg-white">
-  © 2026 EventNov@. All rights reserved. <a href="#" class="hover:text-accent">Privacy Policy</a> | <a href="#" class="hover:text-accent">Terms of Service</a>
+  © <span id="footer-year"></span> EventNov@. All rights reserved. <a href="#" class="hover:text-accent">Privacy Policy</a> | <a href="#" class="hover:text-accent">Terms of Service</a>
 </footer>
 
 <script>
@@ -462,12 +468,15 @@
 
   // Live search filter for event cards
   const searchInput = document.getElementById('event-search');
-  const cards = document.querySelectorAll('#event-grid .event-card');
   const noResults = document.getElementById('no-results');
 
   searchInput.addEventListener('input', () => {
     const query = searchInput.value.trim().toLowerCase();
     let visibleCount = 0;
+
+    // Query the grid fresh on every input so the filter also covers cards
+    // re-rendered from the API (see loadEventsFromApi below).
+    const cards = document.querySelectorAll('#event-grid .event-card');
 
     cards.forEach(card => {
       const haystack = (card.dataset.name + ' ' + card.textContent).toLowerCase();
@@ -506,6 +515,65 @@
     }
     banner.classList.remove('hidden');
   }
+
+  // Footer year
+  const y = document.getElementById('footer-year');
+  if (y) y.textContent = new Date().getFullYear();
+
+  // Escape user/admin-entered text before injecting it into the grid (XSS guard)
+  const escapeHtml = (value) => String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+  // Load event types from the API and replace the static fallback cards.
+  // On any failure (or empty list) the static cards stay untouched.
+  async function loadEventsFromApi() {
+    try {
+      const response = await fetch(`${window.API_BASE_URL}/events`);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const data = await response.json();
+      const events = data && Array.isArray(data.events) ? data.events : [];
+
+      if (!data || !data.success || events.length === 0) {
+        console.warn('[events] API returned no event types — keeping static fallback cards.');
+        return;
+      }
+
+      const grid = document.getElementById('event-grid');
+      grid.innerHTML = events.map(ev => {
+        const price = (Number(ev.startingPrice) || 0).toLocaleString('en-IN');
+        const rating = ev.rating ?? '—';
+        const reviews = ev.reviews ?? 0;
+        const dataName = escapeHtml(`${ev.title} ${ev.category} ${ev.description}`);
+        return `
+          <div class="event-card p-6 flex flex-col" data-name="${dataName}">
+            <div class="event-icon mb-4">${escapeHtml(ev.icon || '🎉')}</div>
+            <h3 class="text-xl font-semibold text-navy mb-2">${escapeHtml(ev.title)}</h3>
+            <p class="text-gray-600 mb-4 flex-grow">${escapeHtml(ev.description)}</p>
+            <div class="flex items-center gap-2 mb-3 text-sm">
+              <span class="text-amber-500">★★★★★</span>
+              <span class="text-gray-500">${escapeHtml(rating)} (${escapeHtml(reviews)} reviews)</span>
+            </div>
+            <div class="flex items-center justify-between border-t pt-3">
+              <span class="category-chip">${escapeHtml(ev.category)}</span>
+              <div class="text-right">
+                <p class="text-xs text-gray-500">Starting from</p>
+                <p class="text-sm font-semibold text-navy">₹${price}</p>
+              </div>
+            </div>
+            <a href="contact.html" class="card-cta mt-4">Book this event →</a>
+          </div>
+        `;
+      }).join('');
+    } catch (err) {
+      console.warn('[events] Could not load event types from API — keeping static fallback cards.', err);
+    }
+  }
+
+  loadEventsFromApi();
 </script>
 
 <!-- Authentication Script -->

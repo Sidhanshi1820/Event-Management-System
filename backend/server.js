@@ -1,6 +1,6 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const session = require('express-session');
+const morgan = require('morgan');
 const cors = require('cors');
 const helmet = require('helmet');
 const { rateLimit } = require('express-rate-limit');
@@ -11,20 +11,19 @@ const { MongoMemoryServer } = require('mongodb-memory-server');
 
 // Always load the backend/.env, never a .env found relative to the process CWD
 // (running `node backend/server.js` from the repo root would otherwise pick up the
-// Docker-only root .env and leave JWT_SECRET/SESSION_SECRET undefined).
+// Docker-only root .env and leave JWT_SECRET undefined).
 dotenv.config({ path: path.join(__dirname, '.env') });
 
 const isProd = process.env.NODE_ENV === 'production';
 
 // Startup secret validation - refuse to boot with missing/weak secrets
-const SECRET_NAMES = ['JWT_SECRET', 'SESSION_SECRET'];
+const SECRET_NAMES = ['JWT_SECRET'];
 // Substring markers matched case-insensitively. 'super_secret' and 'changeme'
 // are the values INSTALLATION.md tells users to set, and 'your_*' still covers
 // the older doc defaults.
 const WEAK_SECRETS = [
   'change_this',
   'your_jwt_secret',
-  'your_session_secret',
   'super_secret',
   'generate_random_string',
   'changeme'
@@ -40,7 +39,7 @@ const missingSecrets = SECRET_NAMES.filter((name) => !(process.env[name] || '').
 if (missingSecrets.length > 0) {
   console.error('\n✗ FATAL: required secrets are missing or empty:');
   missingSecrets.forEach((name) => console.error(`   - ${name} is missing or empty`));
-  console.error('   Set strong JWT_SECRET and SESSION_SECRET in your environment.\n');
+  console.error('   Set a strong JWT_SECRET in your environment.\n');
   process.exit(1);
 }
 
@@ -59,7 +58,7 @@ if (placeholderProblems.length > 0) {
   if (isProd) {
     console.error('\n✗ FATAL: insecure secrets detected:');
     placeholderProblems.forEach((problem) => console.error(`   - ${problem}`));
-    console.error('   Set strong JWT_SECRET and SESSION_SECRET in your environment.\n');
+    console.error('   Set a strong JWT_SECRET in your environment.\n');
     process.exit(1);
   } else {
     console.warn('\n🟡 WARNING: insecure secrets detected (development mode, continuing):');
@@ -86,6 +85,7 @@ const allowedOrigins = (process.env.CORS_ORIGIN
 // CSP is disabled because the site loads Tailwind from a CDN and uses inline
 // scripts; wiring up nonces/hashes is tracked as follow-up work.
 app.use(helmet({ contentSecurityPolicy: false }));
+app.use(morgan('dev'));
 app.use(cors({
   origin: (origin, cb) => {
     if (!origin) return cb(null, true); // curl/Postman send no Origin
@@ -135,19 +135,6 @@ const proposalLimiter = rateLimit({
   limit: 5
 });
 
-// Session configuration
-app.use(session({
-  secret: process.env.SESSION_SECRET,
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    httpOnly: true,
-    sameSite: 'lax',
-    secure: isProd
-  }
-}));
-
 // MongoDB Connection
 const connectDatabase = async () => {
   const localUri = process.env.MONGODB_URI || 'mongodb://localhost:27017/event_management';
@@ -186,6 +173,7 @@ app.use('/api/proposals', proposalLimiter);
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/users', require('./routes/users'));
 app.use('/api/proposals', require('./routes/proposals'));
+app.use('/api/events', require('./routes/events'));
 
 // Root route
 app.get('/', (req, res) => {
@@ -217,4 +205,8 @@ const startServer = async () => {
   });
 };
 
-startServer();
+module.exports = app;
+
+if (require.main === module) {
+  startServer();
+}

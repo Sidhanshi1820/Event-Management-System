@@ -5,6 +5,7 @@
   <title>Get Started - EventNov@</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="description" content="Sign in or create your EventNov@ account to start planning corporate events." />
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg" />
 
   <!-- Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
@@ -166,6 +167,9 @@
 
 <section class="pb-20 bg-greybg">
   <div class="max-w-md mx-auto px-6">
+    <!-- Email verification result banner -->
+    <div id="verify-banner" class="hidden mb-6 p-4 border rounded-lg text-sm text-center"></div>
+
     <div class="bg-white p-8 rounded-xl shadow-lg">
       <!-- Already signed in notice -->
       <div id="signed-in-notice" class="hidden mb-6 p-4 bg-teal-50 border border-teal-200 rounded-lg text-sm text-teal-800 text-center">
@@ -199,7 +203,7 @@
               <input type="checkbox" id="login-remember" name="remember" class="mr-2">
               <span class="text-sm text-gray-600">Remember me</span>
             </label>
-            <a href="#" class="text-sm text-accent hover:underline">Forgot password?</a>
+            <a href="forgot-password.html" class="text-sm text-accent hover:underline">Forgot password?</a>
           </div>
           <button type="submit" class="btn-submit w-full bg-navy text-white py-3 px-6 rounded-lg font-semibold hover:bg-opacity-90">Login</button>
           <div class="form-message mt-4 text-center hidden"></div>
@@ -236,7 +240,7 @@
           <div class="flex items-start">
             <input type="checkbox" id="register-terms" name="terms" class="mr-2 mt-1" required>
             <label for="register-terms" class="text-sm text-gray-600">
-              I agree to the <a href="#" class="text-accent hover:underline">Terms of Service</a> and <a href="#" class="text-accent hover:underline">Privacy Policy</a>.
+              I agree to the <a href="terms.html" class="text-accent hover:underline">Terms of Service</a> and <a href="privacy.html" class="text-accent hover:underline">Privacy Policy</a>.
             </label>
           </div>
           <button type="submit" class="btn-submit w-full bg-navy text-white py-3 px-6 rounded-lg font-semibold hover:bg-opacity-90">Register</button>
@@ -251,7 +255,7 @@
 </section>
 
 <footer class="py-10 text-center text-sm text-gray-500 border-t bg-white">
-  © 2026 EventNov@. All rights reserved. <a href="#" class="hover:text-accent">Privacy Policy</a> | <a href="#" class="hover:text-accent">Terms of Service</a>
+  © <span id="footer-year"></span> EventNov@. All rights reserved. <a href="privacy.html" class="hover:text-accent">Privacy Policy</a> | <a href="terms.html" class="hover:text-accent">Terms of Service</a>
 </footer>
 
 <script>
@@ -262,6 +266,22 @@
     hamburger.classList.toggle('active');
     navMenu.classList.toggle('active');
   });
+
+  // Footer year
+  const y = document.getElementById('footer-year');
+  if (y) y.textContent = new Date().getFullYear();
+
+  // Email verification result banner (redirect from GET /api/auth/verify/:token)
+  const verifyBanner = document.getElementById('verify-banner');
+  if (location.search.includes('verified=1')) {
+    verifyBanner.textContent = 'Email verified successfully! You can now log in.';
+    verifyBanner.classList.remove('hidden');
+    verifyBanner.classList.add('bg-green-50', 'border-green-200', 'text-green-800');
+  } else if (location.search.includes('verified=0')) {
+    verifyBanner.textContent = 'That verification link was invalid or has expired.';
+    verifyBanner.classList.remove('hidden');
+    verifyBanner.classList.add('bg-orange-50', 'border-orange-200', 'text-orange-800');
+  }
 
   // Login / Register tab switching
   const loginPanel = document.getElementById('login-panel');
@@ -282,8 +302,9 @@
     }
   }
 
-  // Default to Register for "Get Started", unless #login is requested
-  showTab(location.hash === '#login' ? 'login' : 'register');
+  // Default to Register for "Get Started", unless #login is requested or the
+  // user just verified their email (then show Login so they can sign in)
+  showTab(location.hash === '#login' || location.search.includes('verified=1') ? 'login' : 'register');
   window.addEventListener('hashchange', () => {
     showTab(location.hash === '#login' ? 'login' : 'register');
   });
@@ -309,6 +330,9 @@
     notice.classList.remove('hidden');
   }
 </script>
+
+<!-- API base URL (must load before auth.js) -->
+<script src="config.js"></script>
 
 <!-- Authentication Script -->
 <script src="./auth.js"></script>
